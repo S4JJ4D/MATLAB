@@ -1,16 +1,18 @@
 classdef DynamicSpring < handle
     %SPRING represents a spring with varying height
-    %   Here, we describe a spring geometric structure
+    % Geometric structure of a spring is described by
     % by 6 variables (not all are independent) that are related to
     % eachother by the following equations:
     %
-    % spring constraint equations
+    % spring constraint equations:
     % 1. s = theta_tot * sqrt(r ^2 + p ^ 2);
     % 2. h = theta_tot * p;
     % 3. theta_tot = 2*pi * k;
 
-    % Changing the radius and length of the spring is allowed. These are
-    % considered spring "independent parameters" to be set or changed.
+    % Changing the radius, pitch, and number of turns of a spring is allowed. These are
+    % considered spring "parameters" to be set or changed by class user.
+
+    % A name must be supplied to distinguish spring plot objects
     properties
         name   (1,:) char % spring name
         radius (1,1) double {mustBeReal, mustBeNonnegative} % radius the spring
@@ -18,28 +20,23 @@ classdef DynamicSpring < handle
         turns  (1,1) double {mustBeReal, mustBeNonnegative} % number of coil turns
     end
 
-    % height is considerend the primary variable of the spring to be set by
-    % class user. When the height is set externally, spring variables are
-    % changed to accomadate the new height. Changes in variables are done
-    % in a manner to resemble the strech of compression of the spring when
-    % it is mechanically loaded.
     properties (Dependent)
-        theta   % total angle through which the spring coil is wound
-        length  % total length of the coil
-        height  % height of the spring (linear length of the spring)
+        theta       % total angle through which the spring coil is wound
+        length      % total length of the coil
+        height      % height of the spring (linear length of the spring)
 
-        hg_tag;
-        plt_tag;
+        hg_tag;     % a tag attached to hgtransform object whose child is spring plot
+        plt_tag;    % a tag attached to a spring plot object whose parent is a hgtransform
     end
 
     properties(SetAccess = private)
-        ax
+        ax          % axes on which a spring is plotted
     end
 
-    methods
 
+    methods
         function obj = DynamicSpring(name, radius, pitch, turns)
-            %SPRING Construct an instance of this class
+            %SPRING Constructor
             arguments
                 name    (1,:) char
                 radius
@@ -53,6 +50,11 @@ classdef DynamicSpring < handle
         end
 
         %%
+        % height is considerend the primary variable of the spring to be set by
+        % class user. When the height is set externally, spring variables are
+        % changed to accomadate the new height. Changes in variables are done
+        % in a manner to resemble the strech or compression of the spring when
+        % it is mechanically loaded.
         function SetHeight(obj, height)
             arguments
                 obj
@@ -66,17 +68,21 @@ classdef DynamicSpring < handle
         function PlotSpring(obj, anchorPoint, angle, height, options)
             arguments
                 obj
-                anchorPoint
-                angle
-                height
-                options.axes (1,1) {mustBeA(options.axes,["matlab.graphics.axis.Axes"," 'matlab.ui.control.UIAxes'"]), mustBeNonDeletedGraphicalObject}
+                anchorPoint   (1,2) double % The primary end of the spring (usually fixed)
+                angle         (1,1) double % Spring orientation on the plane
+                height        (1,1) double % Spring linear length
+                options.axes  (1,1) {mustBeA(options.axes,["matlab.graphics.axis.Axes"," 'matlab.ui.control.UIAxes'"]), mustBeNonDeletedGraphicalObject}
+                options.color (1,:) char = 'red' % Spring color
+
+                % Additional plot customizing arguments could be added here
             end
 
+            % Adjusting spring shape for the given height
             obj.SetHeight(height);
 
             if (isempty(obj.ax))
                 % no axes are set for plotting
-                if (isempty(fieldnames(options)))
+                if (~any(cellfun(@(x)strcmpi(x,'axes'), fieldnames(options))))
                     % no axes is provided by the user either!
                     error('Provide and axes object in the optional arguments to draw the spring');
                 end
@@ -85,7 +91,7 @@ classdef DynamicSpring < handle
 
                 hg = hgtransform(obj.ax, 'Tag', obj.hg_tag);
                 t = 0:0.01:obj.theta;
-                spring_plt = plot(obj.ax, obj.radius * sin(t), obj.pitch*t, 'Tag', obj.plt_tag, 'LineWidth', 1.5);
+                spring_plt = plot(obj.ax, obj.radius * sin(t), obj.pitch*t, 'Tag', obj.plt_tag, 'LineWidth', 1.5, 'Color', options.color);
                 set(spring_plt, 'Parent', hg);
 
                 hg.Matrix = makehgtform('translate', [anchorPoint, 0]) * ...
@@ -93,7 +99,7 @@ classdef DynamicSpring < handle
             else
                 % we have axes in our object, but if the user has
                 % explicitly supplied an axes object, use that one
-                if (~isempty(fieldnames(options)))
+                if (any(cellfun(@(x)strcmpi(x,'axes'), fieldnames(options))))
                     obj.ax = options.axes;
                 else
                     % if the user has not explicitly specified an axes
@@ -110,7 +116,7 @@ classdef DynamicSpring < handle
                 t = 0:0.01:obj.theta;
                 spring_plt = findobj(hg, 'Tag', obj.plt_tag);
                 if (isempty(spring_plt))
-                    spring_plt = plot(obj.ax, obj.radius * sin(t), obj.pitch*t, 'Tag', obj.plt_tag, 'LineWidth', 1.5);
+                    spring_plt = plot(obj.ax, obj.radius * sin(t), obj.pitch*t, 'Tag', obj.plt_tag, 'LineWidth', 1.5, 'Color', options.color);
                     set(spring_plt, 'Parent', hg);
                 else
                     set(spring_plt, 'XData', obj.radius * sin(t), 'YData', obj.pitch * t);
@@ -119,10 +125,7 @@ classdef DynamicSpring < handle
                 hg.Matrix = makehgtform('translate', [anchorPoint, 0]) * ...
                     makehgtform('zrotate', angle-pi/2);
             end
-
         end
-
-
     end
 
     %% Dependent Methods Getters
