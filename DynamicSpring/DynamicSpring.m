@@ -33,7 +33,7 @@ classdef DynamicSpring < handle
         ax          % axes on which a spring is plotted
     end
 
-
+% ------------------------------------------------------------------------------------------------
     methods
         function obj = DynamicSpring(name, radius, pitch, turns)
             %SPRING Constructor
@@ -62,7 +62,6 @@ classdef DynamicSpring < handle
             end
             obj.pitch = height/obj.theta;
         end
-
 
         %% Plotting
         function PlotSpring(obj, anchorPoint, angle, height, options)
@@ -127,7 +126,7 @@ classdef DynamicSpring < handle
             end
         end
     end
-
+% ------------------------------------------------------------------------------------------------
     %% Dependent Methods Getters
     methods
         function theta_val = get.theta(obj)
@@ -152,7 +151,7 @@ classdef DynamicSpring < handle
 
     end
 end
-
+% ------------------------------------------------------------------------------------------------
 %% Custom validation function
 function mustBeNonDeletedGraphicalObject(a)
 if ~isgraphics(a)
