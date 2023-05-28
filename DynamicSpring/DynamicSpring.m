@@ -77,7 +77,7 @@ classdef DynamicSpring < handle
                 anchorPoint   (1,2) double % The primary end of the spring (usually fixed)
                 angle         (1,1) double % Spring orientation on the plane
                 height        (1,1) double % Spring linear length
-                options.axes  (1,1) {mustBeA(options.axes,["matlab.graphics.axis.Axes"," 'matlab.ui.control.UIAxes'"]), mustBeNonDeletedGraphicalObject}
+                options.axes  (1,1) {mustBeA(options.axes,["matlab.graphics.axis.Axes", "matlab.ui.control.UIAxes"]), mustBeNonDeletedGraphicalObject}
                 options.color (1,:) char = 'red' % Spring color
 
                 % Additional plot customizing arguments could be added here
