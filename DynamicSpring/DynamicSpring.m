@@ -16,8 +16,7 @@ classdef DynamicSpring < handle
     % 1. Define a spring with name="spring1", radius=0.2, initialPitch=0.03 and 12 turns:
     % spr1 = DynamicSpring('spring1', .2, .03, 12)
     % 2. Plot the spring when it is anchored at [1, 2], oriented at 30
-    % degrees w.r.t the horizontal line and is stretched to a given length
-    % of 5:
+    % degrees w.r.t the horizontal line and is stretched to a given length of 5:
     % spr1.PlotSpring([1, 2], pi/6, 5, axes=ax, color='#0056A1');
 
     % A name must be supplied to distinguish spring plot objects
