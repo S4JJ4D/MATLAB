@@ -19,7 +19,7 @@ grid on;
 box on;
 % xline(0, 'k--');
 % yline(0, 'k--');
-axis([-1 10 -5 5]);
+axis([-1 11 -8 2]);
 ax.DataAspectRatio = [1 1 1];
 
 
@@ -29,19 +29,26 @@ f = [1, 2, 3, 4];
 x = [0, 1.5, 1.5, 0] + offset;
 y = [-1, -1, 1, 1];
 
-box_patch = patch(ax, 'XData', x, 'YData', y, ...
+types_list = ["simplified", "detailed", "axled"];
+numTypes = numel(types_list);
+
+boxes = gobjects(1, numTypes);
+
+for i=1:numTypes
+    boxes(i) = patch(ax, 'XData', x, 'YData', y - 3*(i-1), ...
     'FaceColor', 'k', 'FaceAlpha', .5, 'LineWidth', 1.5);
-hold on;
+
+    springs(i) = DynamicSpring("spring"+i, 'Radius', .25, 'Pitch', .03, 'Turns', 18,...
+    'Axes', ax, 'VisualForm', types_list(i));
+    springs(i).plotting_options.FrontEyeInnerColor = 'r';
+
+    texts(i) = text(8, -3*(i-1), types_list(i), ...
+        'FontName', 'Source Code Pro', 'FontWeight', 'bold', ...
+        'FontSize', 11); 
+end
 
 
-sp1 = DynamicSpring('spring1', 'Radius', .25, 'Pitch', .03, 'Turns', 18,...
-    'Axes', ax, 'VisualForm', 'with_damper');
-
-sp1.plotting_options.FrontEyeInnerColor = 'r';
-
-%% Run Simulation
-% loads pre-computed trajectory variables: Qx, Qy, time
-% load('motionData.mat');
+%% Simulation and Animation
 
 m = .05;
 b = .05;
@@ -56,16 +63,23 @@ Qy = zeros(1, numel(time));
 n=1;
 freq = 1/median(diff(time));
 
-sp1.PlotSpring(vecnorm([Qx(n), Qy(n)]), 'Configuration', [0, 0, atan2(Qy(n), Qx(n))]);
+
+for i=1:numTypes
+    springs(i).PlotSpring(vecnorm([Qx(n), Qy(n)]), 'Configuration', [0, -3*(i-1), atan2(Qy(n), Qx(n))]);
+end
 
 pause(.5);
 
-t=0; %time initialization
+t = 0; %time initialization
 n = 1;
 tic;    %start time measuring
 while (n <= numel(time))
-    sp1.PlotSpring(vecnorm([Qx(n), Qy(n)]), 'Configuration', [0, 0, atan2(Qy(n), Qx(n))]);
-    set(box_patch, 'XData', [0, 1.25, 1.25, 0] + Qx(n));
+
+    for i=1:numTypes
+        set(boxes(i), 'XData', [0, 1.25, 1.25, 0] + Qx(n));
+        springs(i).PlotSpring(vecnorm([Qx(n), Qy(n)]), 'Configuration', [0, -3*(i-1), atan2(Qy(n), Qx(n))]);
+    end
+
     drawnow;
     t = toc; %measuring current time
     n = round(t*freq)+1;

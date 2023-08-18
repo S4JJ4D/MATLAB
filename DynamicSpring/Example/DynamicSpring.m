@@ -35,9 +35,10 @@ classdef DynamicSpring < handle
     %
     %   The graphical model of the spring is obtained from the mathematical
     %   descrpition of a rising sinusoidal curve in the 3D space which is
-    %   described by the following set of equations: (<strong>t<strong> is an independent
-    %   parameter)
-    %   R(t) = (A0*cos(w*t), B0*sin(w*t), C0*t) \in R³
+    %   described by the following map: (<strong>t</strong> is the independent
+    %   variable)
+    %   
+    %   t -> (A0*cos(w*t), B0*sin(w*t), C0*t) \in R³
     %
     %   Changing the radius, pitch, and number of turns of a spring is permissible
     %   through the class interface. These are considered spring "defining parameters"
@@ -45,7 +46,6 @@ classdef DynamicSpring < handle
     %
     %   Examples:
     %
-    %     Define and plot a spring:
     %     - Define a spring:
     %       sp1 = DynamicSpring('spring1', 'Radius', .25, 'Pitch', .03, 'Turns', 18, 'Axes', ax);
     %
@@ -53,8 +53,8 @@ classdef DynamicSpring < handle
     %       w.r.t the horizontal line and is stretched to a given length of 5:
     %       sp1.PlotSpring(5, 'Configuration', [1, 2, pi/6]);
     %
-    %     - Plot the spring with "with_damper" visual form:
-    %       sp1.visual_form = "with_damper";
+    %     - Plot the spring with "axled" visual form:
+    %       sp1.visual_form = "axled";
     %
     %     - Plot the spring with gray color:
     %       sp1.plotting_options.SpringBodyColor = [.6 .6 .6]
@@ -71,7 +71,7 @@ classdef DynamicSpring < handle
             'RearEyeInnerColor', 'none', 'RearEyeInnerColorAlpha', 1.0, ...
             'FrontEyeInnerColor', 'none', 'FrontEyeInnerColorAlpha', 1.0, ...
             'RearClevisColor', 'w', 'FrontClevisColor', 'w');
-        visual_form {mustBeMember(visual_form, ["simplified", "detailed", "with_damper"])} = "detailed"
+        visual_form {mustBeMember(visual_form, ["simplified", "detailed", "axled"])} = "detailed"
     end
 
     properties (Dependent)
@@ -105,7 +105,7 @@ classdef DynamicSpring < handle
                 options.Turns                   (1,1) double {mustBeReal, mustBeNonnegative} = 12
                 options.Configuration           (1,3) double {mustBeReal}                    = [0 0 0];
                 options.Axes {mustBeA(options.Axes,["matlab.graphics.axis.Axes","matlab.ui.control.UIAxes", "double"]), mustBeEmptyIfDouble, mustBeNonDeletedGraphicalObject} = []
-                options.VisualForm {mustBeMember(options.VisualForm, ["simplified", "detailed", "with_damper"])} = "detailed"
+                options.VisualForm {mustBeMember(options.VisualForm, ["simplified", "detailed", "axled"])} = "detailed"
             end
 
             % Check for name conflicts:
@@ -276,7 +276,7 @@ classdef DynamicSpring < handle
         function setVisualForm(obj, new_visual_form)
             arguments
                 obj
-                new_visual_form {mustBeMember(new_visual_form, ["simplified", "detailed", "with_damper"])}
+                new_visual_form {mustBeMember(new_visual_form, ["simplified", "detailed", "axled"])}
             end
             obj.visual_form = new_visual_form;
             if obj.is_plotted
