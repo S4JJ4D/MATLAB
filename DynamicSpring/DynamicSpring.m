@@ -12,7 +12,8 @@ classdef DynamicSpring < handle
     %   object.
     %
     %   DYNAMICSPRING(..., 'VisualForm', vf) plots the spring object with the
-    %   speficed visual form. vf is either "simplified" or "detailed"
+    %   speficed visual form. Currently supported forms are "simplified", "detailed",
+    %   and "axled".
     %
     %   Geometric structure of a spring (state) is described by six variables
     %   (not all are independent) that are related via a set of constraint equations
