@@ -39,9 +39,9 @@ cld = feedback(series(Cd, Pd), 1);
 % Since all signals in a digital control system are sampled at constant
 % rate, data is only available at times separated by Ts
 td = 0:Ts:t_f;
-yd = step(cld, td);
+yd = step(cld, td');
 plot(td, yd, '*', 'DisplayName', ...
-    ['y[n]: Sampled plant output in the digital control system', ...
+    ['$y[n]$: Sampled plant output in the digital control system', ...
     newline, ...
     ': plant output seen by the computer: output picked by the sensor']);
 hold on;
@@ -55,15 +55,17 @@ uidx = 4;        % [r]
 Sys = imp2exp(A,yidx,uidx); 
 Sys.InputName = {'r'}; 
 Sys.OutputName = {'u';'y';'e'};
-ud = step(Sys(1), td);
+ud = step(Sys(1), td');
 
+% search for the word 'resampling' in the following comments which
+% discuesses a way to retrieve sampled-time signals within the ltf control
+% structure.
 
 
 % Set up the continuous interconnection and calculate the sampled data response with sdlsim.
-
-%
- % This is the structure used for 'sdlsim' function. This is used to
- % emulate the sampled-data (hybrid) control system where the plant is a
+ %
+ % Following control system is the target for 'sdlsim' function. sdlsim is used 
+ % to emulate the sampled-data (hybrid) control system where the plant is a
  % continuous-time system and the controller is a digital system. Plant is
  % preceeded by a ZOH (D/A) and followed by A/D before contacting the
  % controller.
@@ -103,46 +105,89 @@ ud = step(Sys(1), td);
  % system is used: 
  % w is the exposed input and v is the exposed output.
  % 
+ % The overall structure of the control system is shown here:
  %
- %                                M
- %                         ┌─────────────┐
- %                         │             │
- %               w=r=u     │        ┌─┐  │    y1=y(t)=v
- %          ───────────────┼──┐  ┌─►│P├──┼────────────────────►
- %                         │  │  │  └─┘  │
- %                         │  │  │       │
- %                         │  │  │       │
- %                         │  │  │       │    y2
- %                         │  └──┼───────┼─────────────────────┐
- %                         │     │       │                     │
- %                         │     │       │                     │
- %                 u2      │     │  ┌─┐  │    y3               │
- %          ┌──────────────┼─────┴─►│P├──┼────────────────┐    │
- %          │              │        └─┘  │                │    │
- %          │              │             │                │    │
- %          │              └─────────────┘                │    │
- %          │                                             │    │
- %          │                                             │    │
- %          │                                             │    │
- %          │                                             │    │
- %          │                                             │    │
- %          │                                             │    │
- %          │                                             │    │
- %          │           ┌───────────────────┐             │    │
- %          │           │                   │             │    │
- %          │           │    888    d8P     ├────┬─────┐  │    │
- %          │           │    888   d8P      │◄├┼┼│ A/D │◄─┘    │
- %          │           │    888  d8P       ├────┴─────┘       │
- %          │  ┌───┬────┤    888d88K        │                  │
- %          └──┤ZOH│◄├┼┼│    8888888b       │                  │
- %             └───┴────┤    888  Y88b      ├────┬─────┐       │
- %                      │    888   Y88b     │◄├┼┼│ A/D │◄──────┘
- %                      │    888    Y88b    ├────┴─────┘
- %                      │                   │
- %                      └───────────────────┘
  %
+ %                                                                        
+ %                         ┌─────────────────┐                        
+ %                u1       │     ██████╗     │       y1               
+ %      ──────────────────▶│     ██╔══██╗    ├───────────────────────▶
+ %                         │     ██████╔╝    │       y2               
+ %                         │     ██╔═══╝     ├───────────────────┐    
+ %                u2       │     ██║         │       y3          │    
+ %           ┌────────────▶│     ╚═╝         ├────────────────┐  │    
+ %           │             └─────────────────┘                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │                                                │  │    
+ %           │             ┌─────────────────┐                │  │    
+ %           │             │                 │                │  │    
+ %           │             │    ██╗  ██╗     ├──┬┬┬┬─────┐    │  │    
+ %           │  ┌─────┬──┬┬┤    ██║ ██╔╝     │◀─┼┼┤│ A/D │◀───┘  │    
+ %           └──┤ ZOH │◀─┼┼┤    █████╔╝      ├──┴┴┴┴─────┘       │    
+ %              └─────┴──┴┴┤    ██╔═██╗      ├──┬┬┬┬─────┐       │    
+ %                         │    ██║  ██╗     │◀─┼┼┤│ A/D │◀──────┘    
+ %                         │    ╚═╝  ╚═╝     ├──┴┴┴┴─────┘            
+ %                         └─────────────────┘                        
+ %                                                                    
+ %                                                                        
+ %
+ % The internal plumbing in systems P and K is as follows:
+ %
+ %
+ %                            M
+ %                     ┌─────────────┐
+ %                     │             │
+ %         w=r=u1      │        ┌─┐  │    y1=y(t)=v
+ %      ───────────────┼──┐  ┌─►│P├──┼────────────────────►
+ %                     │  │  │  └─┘  │
+ %                     │  │  │       │
+ %                     │  │  │       │
+ %                     │  │  │       │    y2
+ %                     │  └──┼───────┼─────────────────────┐
+ %                     │     │       │                     │
+ %                     │     │       │                     │
+ %             u2      │     │  ┌─┐  │    y3               │
+ %      ┌──────────────┼─────┴─►│P├──┼────────────────┐    │
+ %      │              │        └─┘  │                │    │
+ %      │              │             │                │    │
+ %      │              └─────────────┘                │    │
+ %      │                                             │    │
+ %      │                                             │    │
+ %      │                                             │    │
+ %      │                                             │    │
+ %      │                                             │    │
+ %      │                    K                        │    │
+ %      │           ┌───────────────────┐             │    │
+ %      │           │                   │             │    │
+ %      │           │           ┌──┐    ├────┬─────┐  │    │
+ %      │           │     +-----┤-C│<---┤◄├┼┼│ A/D │◄─┘    │
+ %      │           │     |     └──┘    ├────┴─────┘       │
+ %      │           │     |             │                  │
+ %      │  ┌───┬────┤   ┌─▼─┐           │                  │
+ %      └──┤ZOH│◄├┼┼┤<--┤SUM│           │                  │
+ %         └───┴────┤   └─▲─┘           │                  │
+ %                  │     |     ┌──┐    ├────┬─────┐       │
+ %                  │     +-----┤ C│<---┤◄├┼┼│ A/D │◄──────┘
+ %                  │           └──┘    ├────┴─────┘
+ %                  │                   │
+ %                  └───────────────────┘
+ % 
+ % 
  % All the signals in this diagram, except for the ones shown by the symbol
- % ◄├┼┼ (signals, sampled with Ts) are included in the output of 'sdlsim' function.
+ % ◄├┼┼ (signals sampled with Ts) are included in the output of 'sdlsim' function.
+ % To access discrete-time signals, we can resample u2, y2, and y3, at
+ % sampling frequence of the controller, Ts.
+ % %%% Resampling of a sdlsim signal named 'x':
+ % %%% idx = 1:Ts/Tc:numel(x);
+ % %%% xd = x(idx);
  % 
  % Notes on 'sdlsim' function:
  % 1. It is required that nusys > nu and nysys > ny, where
@@ -169,23 +214,29 @@ ud = step(Sys(1), td);
  %
  %
  % 2. 'sdlsim' automatically connects internal signals, exposing 'nusys-nu'
- % input signals and 'nysys-ny' output signals.
+ % input signals and 'nysys-ny' output signals. (There's also an
+ % undocumented way of calling lft which uses names of the signals for
+ % connections. Execute the command 'edit lft' in command window to see
+ % more information. I tried to use it, but it seems to have issues.)
  % This is an example where
  % nusys = 6;
  % nysys = 5;
  % nu = 2;
  % ny= 3;
- % Exposed inputs are  w = [u1, u2, u3, u4];
- % Exposed outputs are y = [y1, y2];
+ % In sdlsim terminology,
+ % Exposed inputs are     w = [u1, u2, u3, u4];
+ % Exposed outputs are   vt = [y1 y2];
+ % Inputs to K are       yt = [y3 y4 y5];      % notice the order of entries
+ % Outputs from K are    ut = [u5 u6];         % notice the order of entries
  %
  %                          ┌────────────┐
- %                     u1   │            │
+ %                w1 = u1   │            │
  % ────────────────────────►│            │
- %                     u2   │            │y1
+ %                w2 = u2   │            │y1 = v1
  % ────────────────────────►│            ├─────────────────────►
- %                     u3   │            │y2
+ %                w3 = u3   │            │y2 = v2
  % ────────────────────────►│      P     ├─────────────────────►
- %                     u4   │            │y3
+ %                w4 = u4   │            │y3
  % ────────────────────────►│            ├─────────┐
  %                     u5   │            │y4       │
  %                ┌────────►│            ├──────┐  │
@@ -272,24 +323,25 @@ w = ones(size(t));
 K = [Cd -Cd]; % extended controller to match sdlsim structure: A 2-input, 1-output system
 M = [0 P;1 0;0 P]; % extended plant to match sdlsim structure: A 2-input, 3-output system
 
-[vt,yt,ut,t] = sdlsim(M,K,w,t); 
+% Using Tc to specify integration time of the continuous-time system
+[vt,yt,ut,t] = sdlsim(M,K,w,t,[],[],[],Tc); 
 % actual plant output is unobservable in real life. It is only inspectable
 % in simulation settings.
-plot(vt{1},vt{2}, 'DisplayName', '\bf y(t): Actual plant output in the digital control system');
+plot(vt{1},vt{2}, 'LineWidth', 1.1, 'DisplayName', '\bf $y(t)$: Actual plant output in the digital control system');
 xlabel('time');
 ylabel('amplitude');
 grid on;
-legend('Location','southeast');
+legend('Location','southeast', 'Interpreter', 'latex');
 
 nexttile;
-plot(td, ud, 'r*', 'DisplayName', 'u[n]: Output of the digital controller');
+plot(td, ud, 'r*', 'DisplayName', '$u[n]$: Output of the digital controller');
 hold on;
-plot(ut{1},ut{2}, 'b-', 'DisplayName', ['\bf u(t): Output of the digital controller after ZOH:', newline, ...
-    'right before injecting to the plant']);
+plot(ut{1},ut{2}, 'b-', 'LineWidth', 1, 'DisplayName', ['\bf $u(t)$: Output of the digital controller after ZOH:', newline, ...
+    '\bf right before injecting to the plant']);
 xlabel('time');
 ylabel('amplitude');
 grid on;
-legend;
+legend('Interpreter','latex');
 
 nexttile(3, [1, 2]);
 text(0,0,...
