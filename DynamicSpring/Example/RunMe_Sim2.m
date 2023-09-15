@@ -19,7 +19,7 @@ axis([ -4.7956    4.8454   -4.9919    5.6491]);
 ax.DataAspectRatio = [1 1 1];
 
 sp1 = DynamicSpring('spring1', 'Radius', .25, 'Pitch', .03, 'Turns', 18, 'Axes', ax, 'VisualForm', 'detailed');
-sp2 = DynamicSpring('spring2', 'Radius', .25, 'Pitch', .03, 'Turns', 13, 'Axes', ax, 'VisualForm', 'detailed');
+sp2 = DynamicSpring('spring2', 'Radius', .25, 'Pitch', .03, 'Turns', 13, 'Axes', ax, 'VisualForm', 'axled');
 sp2.plotting_options.FrontEyeOuterColor = 'b';
 sp2.plotting_options.RearEyeOuterColor = 'r';
 
