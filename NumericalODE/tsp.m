@@ -6,21 +6,21 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %   initial condition x0. Approxmation values are evaluated at time
 %   instants separated by time-step h.
 %
-%   F must be a function handle with signature of the form @(x,t).
+%   F must be a function handle with a signature of the form @(x,t).
 %   In general, F is a matrix-valued function whose columns are the
-%   consecutive derivatives of x upto a certain order:
-%   F = [f1, f2, f3, ..., fp] where fi is the a column vector representing
+%   consecutive derivatives of x up to a certain order:
+%   F = [f1, f2, f3, ..., fp] where fi is a column vector representing
 %   the i'th derivate of the state vector x. The number of columns, p,
 %   determines the order of TS method to be used in the function.
 %   Therefore, size(F,1) denotes the number of states in the state vector
-%   and size(F,2) denotes the order p of the numerical method.
-%   As a result, F = [f1] uses forward Euler method, and F = [f1, f2, f3]
+%   and size(F,2) denotes the order p of the numerical method TS(p).
+%   For instance, F = [f1] uses forward Euler method, and F = [f1, f2, f3]
 %   uses TS(3) method to compute the approximation to the solution of the
 %   IVP.
 %
-%   If exact solution is supplied through 'ExactSolution' optional
-%   argument, GE (global error) is also computed and reported in the output
-%   variable.
+%   If the exact solution is supplied through 'ExactSolution' optional
+%   argument, GE (global error) is also computed and reported in along with
+%   other outputs.
 %
 %   ----------------------------------------------------------------------
 %   Example [1]
