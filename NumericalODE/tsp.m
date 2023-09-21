@@ -70,15 +70,15 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %
 
 arguments
-    F   (:,:) function_handle {mustBeAFunctionOfNArguments(F, 2, '@(x,t)'), mustBeOfPrescribedForm(F, '@(x,t)')} % a matrix containing gradient functions [f1, f2, ..., fp] where fi is the i'th derivative of x
+    F   (1,1) function_handle {mustBeAFunctionOfNArguments(F, 2, '@(x,t)'), mustBeOfPrescribedForm(F, '@(x,t)')} % a matrix containing gradient functions [f1, f2, ..., fp] where fi is the i'th derivative of x
     t   (2,1) double {mustBeReal} % timespan, specified as [t0, tf]
-    x0  (:,1) double {mustBeReal, CheckLengthOfMatrixValuedFcnHandleWithVector(x0, F)} % vector of initial conditions
+    x0  (:,1) double {mustBeReal, mustBeOfCompatibleSize(x0, F)} % vector of initial conditions
     h   (1,1) double {mustBeReal, mustBePositive} % time-step
 
     options.ExactSolution           (:,1) function_handle ...
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
-        CheckLengthOfVectorValuedFcnHandleWithSingleInput(x0, options.ExactSolution), ...
-        mustBeOfPrescribedForm(options.ExactSolution, '@(t)')} % exact analytical function @(t)
+         mustBeOfPrescribedForm(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
+         mustBeOfCompatibleSize(x0, options.ExactSolution)}
     options.PlotResult              (1,1) logical
     options.PauseDuration           (1,1) {mustBeReal, mustBeNonnegative} = .5;
     options.PlotInterpolatingCurve  (1,1) logical = false;
@@ -191,7 +191,8 @@ if isfield(options, 'PlotResult')
                 'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'w', ...
                 'MarkerSize', 6, 'Tag', ['Approximation Sequence {x_n}: Component ', num2str(i)]);
         end
-
+        
+        % initial pause
         pause(.5);
         pause_duration = options.PauseDuration;
         N = rest.n(end);
@@ -247,18 +248,12 @@ if ~strcmp(f_str(1:numel(form)), form)
 end
 end
 
-function CheckLengthOfMatrixValuedFcnHandleWithVector(x, F)
-try
-    F(x, 1);
-catch
-    erridType = 'CheckLengthWithMatrixValuedFcnHandle:InconsistentDimensions';
-    msgType = 'Function handle and x are dimensionally inconsistent.';
-    throwAsCaller(MException(erridType,msgType))
-end
-end
+function mustBeOfCompatibleSize(x, f)
+% remove argument section
+f_str = strrep(func2str(f), '@(x,t)', '');
+[states_count, ~] = size(str2sym(f_str));
 
-function CheckLengthOfVectorValuedFcnHandleWithSingleInput(x, f)
-if size(f(1),1) ~= size(x,1)
+if states_count ~= size(x,1)
     erridType = 'CheckLengthOfVectorValuedFcnHandleWithSingleInput:InconsistentDimensions';
     msgType = 'Function handle and x are dimensionally inconsistent.';
     throwAsCaller(MException(erridType,msgType))
