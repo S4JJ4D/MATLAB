@@ -19,7 +19,7 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %   IVP.
 %
 %   If the exact solution is supplied through 'ExactSolution' optional
-%   argument, GE (global error) is also computed and reported in along with
+%   argument, GE (global error) is also computed and reported along with
 %   other outputs.
 %
 %   ----------------------------------------------------------------------
