@@ -1,7 +1,7 @@
 % Examples are from:
 % David F. Griffiths · Desmond J. Higham
 % Numerical Methods for Ordinary Differential Equations: Initial Value Problems
-%% Example 2.2 Forward Euler
+%% Verification: Example 2.2 Forward Euler
 close all;
 clear;
 h = .2;
@@ -14,7 +14,7 @@ x = @(t) 1./(1+4*exp(2*(10-t)));
 
 [rest, xp_seq] = tsp(F, timespan, x0, h, 'ExactSolution', x, 'PlotResult', true, 'PauseDuration', .05, 'PlotInterpolatingCurve', true);
 rest
-%% Example 3.3 TS(2)
+%% Verification: Example 3.3 TS(2)
 close all;
 clear;
 
