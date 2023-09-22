@@ -97,6 +97,8 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %
 %   See also TSP.
 
+%   TODO: add library of explicit lmm methods: AB, AM, ...
+
 arguments
     f     (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedForm(f, '@(x,t)')} % a column vector [f] representing the gradient function x'
     t     (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
