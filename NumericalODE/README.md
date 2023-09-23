@@ -1,4 +1,4 @@
-## Dynamic Spring Class
+## Numerical Methods for Solving ODEs
 
 A suite of numerical methods for solving ODEs.
 <p align="center">
