@@ -250,8 +250,12 @@ if options.PlotResult
     end
 
     tlobj = tiledlayout(idx(1), idx(2), 'TileSpacing', 'compact', 'Padding', 'compact');
+    if is_method_specified
+        extra_title = [': ', method];
+    end
 
-    title(tlobj, sprintf('%d-Step LLM Method', k));
+    title(tlobj, sprintf(['%d-Step LLM Method', extra_title], k));
+    subtitle(tlobj, sprintf('Step Size = %.3f', h), 'FontSize', 9);
     for i=1:state_count
         nexttile(i);
         xlabel('Time');

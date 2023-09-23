@@ -54,7 +54,7 @@ close all;
 clear;
 
 % Two-body problem with one mass much larger than the other.
-h = .1;
+h = .2;
 timespan = [0 10];
 x0 = [2 0 0 0.5]';
 F = @(x,t) ...

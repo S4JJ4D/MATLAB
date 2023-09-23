@@ -6,6 +6,20 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %   initial condition x0. Approxmation values are evaluated at time
 %   instants separated by time-step h.
 %
+%   TSP(..., 'ExactSolution', X) uses the exact solution 'X' to
+%   compute global error at each step. Also, the exact solution is plotted
+%   if plotting is enabled.
+%
+%   TSP(..., 'PlotResult', true) plots the resulting approximation
+%   values obtained from numerically solving the IVP.
+%
+%   TSP(..., 'PauseDuration', P) Specifies a the duration of pause (in
+%   seconds) within the animation loop of plotting.
+%
+%   TSP(..., 'PlotInterpolatingCurve', true) Also plots interpolating
+%   curves (a polynomial between two successive approximation points
+%   directly obtained from TS(P) equations).
+%
 %   F must be a function handle with a signature of the form @(x,t).
 %   In general, F is a matrix-valued function whose columns are the
 %   consecutive derivatives of x up to a certain order:
@@ -18,11 +32,8 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %   uses TS(3) method to compute the approximation to the solution of the
 %   IVP.
 %
-%   If the exact solution is supplied through 'ExactSolution' optional
-%   argument, GE (global error) is also computed and reported along with
-%   other outputs.
 %   
-%   REST=TSP(F,T,X0,H) returns the approximation values generated
+%   REST=TSP(F,T,X0,H) returns the approximation points generated
 %   by the numerical method in a tabulated form.
 %
 %   [REST,XP_SEQ]=TSP(F,T,X0,H) also returns the approximations for the
@@ -158,11 +169,12 @@ if options.PlotResult
 
     tlobj = tiledlayout(idx(1), idx(2), 'TileSpacing', 'compact', 'Padding', 'compact');
     if ts_order == 1
-        extra_txt = ': Forward Euler';
+        extra_title = ': Forward Euler';
     else
-        extra_txt = '';
+        extra_title = '';
     end
-    title(tlobj, sprintf(['TS(%d) Method', extra_txt], ts_order));
+    title(tlobj, sprintf(['TS(%d) Method', extra_title], ts_order));
+    subtitle(tlobj, sprintf('Step Size = %.3f', h), 'FontSize', 9);
     for i=1:state_count
         nexttile(i);
         xlabel('Time');
