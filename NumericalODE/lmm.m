@@ -1,14 +1,33 @@
 function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
-%LMM   Explicit Linear Multi-step Method For Solving ODEs.
+%LMM   Explicit Linear Multi-step Method For Numerically Solving ODEs.
 %
-%   LMM(f, t, x0, h) computes the approximation points {x_n} for the given
-%   gradient function f in the time-span specified by t, starting from the
-%   initial condition x0. Approxmation values are evaluated at time
-%   instants separated by time-step h.
+%   LMM(F, T, X0, H, ALPHA, BETA) computes the approximation points {x_n}
+%   for the given gradient function f in the time-span specified by t, 
+%   starting from the initial condition x0. Approximate solutions are 
+%   evaluated at time instants separated by time-step h. ALPHA and BETA
+%   vectors are the lmm coefficients used for numerically solving the IVP.
+%
+%   LMM(F, T, X0, H, 'Method', M) uses the predefined lmm method 'M' to
+%   numerically solve the IVP. Choices for M are:
+%   'AB(2)'   ---  2-step Adams-Bashforth
+%   'AB(3)'   ---  3-step Adams-Bashforth
+%   'AB(4)'   ---  4-step Adams-Bashforth
+%   'AB(5)'   ---  5-step Adams-Bashforth
+%
+%   LMM(..., 'ExactSolution', X) uses the exact solution 'X' to
+%   compute global error at each step. Also, the exact solution is plotted
+%   if plotting is enabled.
+%
+%   LMM(..., 'PlotResult', true) plots the resulting approximation
+%   values obtained from numerically solving the IVP.
+%
+%   LMM(..., 'PauseDuration', P) Specifies a the duration of pause (in
+%   seconds) within the animation loop of plotting.
 %
 %   the general equation of a k-step explicit lmm, involves 2k
 %   coefficients {alpha_i, beta_i} where i spans from 0 to k-1. The general
-%   formula of a k-step explicit lmm is as follows:
+%   formula of a k-step explicit lmm is as follows, where f is the
+%   time-derivative of the state variable x:
 %
 %   x_{n+k} + a_{k-1}*x_{n+k-1} + a_{k-2}*x_{n+k-2} + ... + a_{0}*x_{n} =
 %   h*(b_{k-1}*f_{n+k-1} + b_{k-2}*f_{n+k-2} + ... + b_{0}*f_{n})
@@ -80,16 +99,17 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %                                                             ╰─     ─╯
 %
 %
+%
 %   ----------------------------------------------------------------------
 %   Example [1]
 %
 %   f = @(x,t) [x(2); t-x(1)];
 %   x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
 %   % AB(5)
-%   alpha = [0 0 0 0 -1]';
-%   beta = [251/720, -1274/720, 2616/720, -2774/720, 1901/720]';
+%   % alpha = [0 0 0 0 -1]';
+%   % beta = [251/720, -1274/720, 2616/720, -2774/720, 1901/720]';
 % 
-%   [rest, xp_seq] = lmm(f, [0 5], [1;2], .1, alpha, beta, ...
+%   [rest, xp_seq] = lmm(f, [0 5], [1;2], .1, 'Method', 'AB(5)', ...
 %                        'ExactSolution', x, ...
 %                        'PlotResult', true, ...
 %                        'PauseDuration', .02)
@@ -97,22 +117,60 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %
 %   See also TSP.
 
-%   TODO: add library of explicit lmm methods: AB, AM, ...
-
 arguments
-    f     (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedForm(f, '@(x,t)')} % a column vector [f] representing the gradient function x'
-    t     (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
-    x0    (:,:) double {mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % matrix of initial conditions: number of rows must match the number of states within the system
-    h     (1,1) double {mustBeReal, mustBeNonempty, mustBePositive} % time-step
-    alpha (:,1) double {mustBeReal}
-    beta  (:,1) double {mustBeReal, mustBeOfSameRowSize(alpha, beta, {'alpha', 'beta'})}
-
+    f      (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedForm(f, '@(x,t)')} % a column vector [f] representing the gradient function x'
+    t      (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
+    x0     (:,:) double {mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % matrix of initial conditions: number of rows must match the number of states within the system
+    h      (1,1) double {mustBeReal, mustBeNonempty, mustBePositive} % time-step
+    alpha  (:,1) double {mustBeReal} = []
+    beta   (:,1) double {mustBeReal, mustBeOfSameRowSize(alpha, beta, {'alpha', 'beta'})} = []
+    
+    options.Method (1,:) char {mustBeMember(options.Method, ...
+        {'AB(2)','AB(3)','AB(4)','AB(5)'})}
     options.ExactSolution           (1,1) function_handle ...
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
         mustBeOfPrescribedForm(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
         mustBeOfCompatibleSizeWithFcn(x0, options.ExactSolution, {'x0', 'options.ExactSolution'})}
     options.PlotResult              (1,1) logical = false;
     options.PauseDuration           (1,1) {mustBeReal, mustBeNonnegative} = .1;
+end
+
+% Initialize library methods:
+map_keys = {'AB(2)','AB(3)','AB(4)','AB(5)'};
+map_vals = {...
+    [0,-1;-1/2,3/2], ... %AB(2)
+    [0,0,-1;5/12,-16/12,23/12], ... %AB(3)
+    [0,0,0,-1;-9/24,37/24,-59/24,55/24], ... %AB(4)
+    [0,0,0,0,-1;251/720,-1274/720,2616/720,-2774/720,1901/720]};  %AB(5)
+
+methods_container = containers.Map(map_keys, map_vals);
+
+% Determine whether a method is specified by the user:
+if isfield(options, 'Method')
+    is_method_specified = 1;
+    method = options.Method;
+else
+    is_method_specified = 0;
+    % specify a default method to be used if necessary
+    method = 'AB(2)';
+end
+
+if isempty(alpha) && isempty(beta)
+    % if alpha and beta are not specified by the user or they are supplied
+    % as empty vectors, we choose a method from the library
+    if ~is_method_specified
+        warning(...
+            ['A method from the library must be specified if no alpha/beta is supplied to the function.', ...
+            ' <strong>', method, '</strong> is used as the default method.']);
+    end
+    coeffs = methods_container(method);
+    % extract alpha and beta values for the identified method in the
+    % library
+    alpha = coeffs(1,:).';
+    beta = coeffs(2,:).';
+elseif ~isempty(alpha) && ~isempty(beta) && is_method_specified
+    warning(...
+        'Specified method from the library is ignored. Supplied alpha/beta is used for simulation.');
 end
 
 % Determine the dimension of x0
@@ -160,7 +218,6 @@ if isfield(options, 'ExactSolution')
         x_exact_seq(:, i) = x(t_seq(i));
         GE(:, i) = x_seq(:, i) - x_exact_seq(:, i);
     end
-
 end
 
 steps_count = (N-(k-1));

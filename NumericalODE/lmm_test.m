@@ -64,5 +64,8 @@ alpha = [0 0 0 0 -1]';
 beta = [251/720, -1274/720, 2616/720, -2774/720, 1901/720]';
 
 
-rest=lmm(f, t, x0, h, alpha, beta, "ExactSolution", x, ...
+% rest=lmm(f, t, x0, h, alpha, beta, "ExactSolution", x, ...
+%     "PlotResult", true, "PauseDuration", .02)
+
+rest=lmm(f, t, x0, h, 'Method', 'AB(5)', "ExactSolution", x, ...
     "PlotResult", true, "PauseDuration", .02)

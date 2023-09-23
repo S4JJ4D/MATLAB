@@ -1,4 +1,4 @@
-function [rest,xp_seq]=tsp(F,t,x0,h,options)
+function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %TSP   p-th Order Taylor Series Numerical Method For Solving ODEs.
 %
 %   TSP(F,T,X0,H) computes the approximation points {x_n} for the given
