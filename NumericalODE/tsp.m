@@ -20,6 +20,21 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %   curves (a polynomial between two successive approximation points
 %   directly obtained from TS(P) equations).
 %
+%   TSP(..., 'ReportLTE', true) Also report local truncation error in the
+%   output. This option is only effective when an exact solution is
+%   available.
+%   
+%   REST=TSP(F,T,X0,H) returns the approximation points generated
+%   by the numerical method in a tabulated form.
+%
+%   [REST,XP_SEQ]=TSP(F,T,X0,H) also returns the approximations for the
+%   derivative of the IVP solution. XP_SEQ is a 3D matrix where its 1st
+%   dimension (along the horizontal axis, to the right) is the time axis, 
+%   its 2nd dimension (along the vertical axis towards the bottom) holds
+%   the information for the state variables and the 3rd dimension (to the
+%   plane) holds the derivatives of higher orders.
+%
+%
 %   F must be a function handle with a signature of the form @(x,t).
 %   In general, F is a matrix-valued function whose columns are the
 %   consecutive derivatives of x up to a certain order:
@@ -32,16 +47,41 @@ function [rest, xp_seq]=tsp(F, t, x0, h, options)
 %   uses TS(3) method to compute the approximation to the solution of the
 %   IVP.
 %
-%   
-%   REST=TSP(F,T,X0,H) returns the approximation points generated
-%   by the numerical method in a tabulated form.
+%   LTE at each time point t_{n+1} is obtained by subtracting the exact
+%   value of the solution at that time z(t_{n+1}) from its approximation
+%   which is obtained using a truncated version of Taylor expansion.
+%   Realize that LTE does NOT use the approximation values {xn} obtained
+%   from the numerical method. LTE only accounts for a portion of GE.
 %
-%   [REST,XP_SEQ]=TSP(F,T,X0,H) also returns the approximations for the
-%   derivative of the IVP solution. XP_SEQ is a 3D matrix where its 1st
-%   dimension (along the horizontal axis, to the right) is the time axis, 
-%   its 2nd dimension (along the vertical axis towards the bottom) holds
-%   the information for the state variables and the 3rd dimension (to the
-%   plane) holds the derivatives of higher orders.
+%                                                                                
+%                                  ^                                          
+%                                  z(t+h)                                     
+%                      ╭──────────────────────────────╮                       
+%                      │                              │                       
+%                                                                             
+%        z(t+h)   =   z(t) + h*z'(t) + h^2/2! * z''(t)   +  LTE(t+h)          
+%                                                                             
+%      │        │      │                              │    │        │         
+%      ╰────────╯      ╰──────────────────────────────╯    ╰────────╯         
+%     exact solution        estimate of the exact        estimation error     
+%     at t=t_{n+1}          solution at t=t_{n+1}        committed for this   
+%                                                        approximation        
+%                                                                             
+%                                                                             
+%                                                                                                                                                      
+%                                                                             
+%                                 estimate╭──◎  △                             
+%                            ╭────────────╯     │                             
+%                            │                  │  LTE(n+1)                   
+%                            │                  │                             
+%                     ╭──────╯       ╭───────◎  ▽                             
+%                    ●┴──────────────╯exact                                   
+%                                                                             
+%               ─────┃────────────────────────┃───────────────────────▶    
+%                    ┃                        ┃                               
+%     Time Grid:    t_{n}                    t_{n+1}                          
+%                                                                             
+%                                                                             
 %
 %   ----------------------------------------------------------------------
 %   Example [1]
@@ -102,9 +142,11 @@ arguments
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
         mustBeOfPrescribedForm(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
         mustBeOfCompatibleSizeWithFcn(x0, options.ExactSolution, {'x0', 'options.ExactSolution'})}
-    options.PlotResult              (1,1) logical = false;
     options.PauseDuration           (1,1) {mustBeReal, mustBeNonnegative} = .5;
+    options.PlotResult              (1,1) logical = false;
     options.PlotInterpolatingCurve  (1,1) logical = false;
+    options.ReportLTE               (1,1) logical = false;
+    
 end
 
 % discretize the time domain:
@@ -125,26 +167,39 @@ x_seq(:,1) = x0;
 
 % x_prime sequence: approximations for the derivatives of the solution curve
 xp_seq = zeros(state_count, n_data_points, ts_order);
+% populate the first element:
+xp_seq(:,1,:) = F(x_seq(:,1), t_seq(1));
 
 x_exact_seq = zeros(state_count,n_data_points);
 x_exact_seq(:,1) = x0;
 GE = zeros(state_count,n_data_points);
+LTE = zeros(state_count, n_data_points);
 
 is_exact_available = 0;
 if isfield(options, 'ExactSolution')
     is_exact_available = 1;
     x = options.ExactSolution;
 end
+report_lte = 0;
+if options.ReportLTE && is_exact_available
+    report_lte = 1;
+elseif options.ReportLTE && ~is_exact_available
+    warning('LTE cannot be computed unless an exact solution is availabe.');
+end
 
 cfs = (((h*ones(1,ts_order)).^(1:ts_order)) ./ factorial(1:ts_order)).';
 
 for i=1:N
-    xp_seq(:,i,:) = F(x_seq(:,i), t_seq(i));
-    x_seq(:, i+1) = x_seq(:, i) +F(x_seq(:,i), t_seq(i)) * cfs;
+    x_seq(:, i+1) = x_seq(:, i) + F(x_seq(:,i), t_seq(i)) * cfs;
+    xp_seq(:,i+1,:) = F(x_seq(:,i+1), t_seq(i+1));
 
     if is_exact_available
         x_exact_seq(:, i+1) = x(t_seq(i+1));
         GE(:, i+1) = x_exact_seq(:, i+1) - x_seq(:, i+1);
+    end
+
+    if report_lte
+        LTE(:, i+1) = x_exact_seq(:, i+1) - (x_exact_seq(:, i) +F(x_exact_seq(:,i), t_seq(i)) * cfs);
     end
 end
 
@@ -152,6 +207,9 @@ rest = table(index_seq', t_seq', x_seq', 'VariableNames', {'n', 'tn', 'xn'});
 if is_exact_available
     % concat GE if it is available
     rest = [rest, table(GE', 'VariableNames', {'GE'})];
+end
+if report_lte
+    rest = [rest, table(LTE', 'VariableNames', {'LTE'})];
 end
 
 

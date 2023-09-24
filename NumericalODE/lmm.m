@@ -252,6 +252,8 @@ if options.PlotResult
     tlobj = tiledlayout(idx(1), idx(2), 'TileSpacing', 'compact', 'Padding', 'compact');
     if is_method_specified
         extra_title = [': ', method];
+    else
+        extra_title = '';
     end
 
     title(tlobj, sprintf(['%d-Step LLM Method', extra_title], k));

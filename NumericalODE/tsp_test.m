@@ -12,7 +12,9 @@ F = @(x,t) 2*x*(1-x);
 % define the exact solution for reference
 x = @(t) 1./(1+4*exp(2*(10-t)));
 
-[rest, xp_seq] = tsp(F, timespan, x0, h, 'ExactSolution', x, 'PlotResult', true, 'PauseDuration', .05, 'PlotInterpolatingCurve', true);
+[rest, xp_seq] = tsp(F, timespan, x0, h, 'ExactSolution', x, ...
+    'PlotResult', true, 'PauseDuration', .04, 'PlotInterpolatingCurve', true, ...
+    'ReportLTE', true);
 rest
 %% Verification: Example 3.3 TS(2)
 close all;
@@ -30,7 +32,8 @@ F = @(x,t) [x(2), t-x(1);t-x(1), 1-x(2)];  %TS(2)
 % exact sol: int(expm([0 1;-1 0]*(t-tau)) * [0;1] * tau, tau, 0, t) + expm([0 1;-1 0]*t)*x0
 x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
 
-[rest, xp_seq] = tsp(F, timespan, x0, h, 'ExactSolution', x, 'PauseDuration', .05, 'PlotResult', true, 'PlotInterpolatingCurve', true);
+[rest, xp_seq] = tsp(F, timespan, x0, h, 'ExactSolution', x, ...
+    'PauseDuration', .05, 'PlotResult', true, 'PlotInterpolatingCurve', true);
 rest
 %% Custom
 close all;
