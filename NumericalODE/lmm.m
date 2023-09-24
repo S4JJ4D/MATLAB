@@ -256,7 +256,7 @@ if options.PlotResult
         extra_title = '';
     end
 
-    title(tlobj, sprintf(['%d-Step LLM Method', extra_title], k));
+    title(tlobj, sprintf(['%d-Step LMM Method', extra_title], k));
     subtitle(tlobj, sprintf('Step Size = %.3f', h), 'FontSize', 9);
     for i=1:state_count
         nexttile(i);
