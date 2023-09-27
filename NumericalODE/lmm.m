@@ -13,6 +13,7 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %   'AB(3)'   ---  3-step Adams-Bashforth
 %   'AB(4)'   ---  4-step Adams-Bashforth
 %   'AB(5)'   ---  5-step Adams-Bashforth
+%   'AB(6)'   ---  6-step Adams-Bashforth
 %
 %   LMM(..., 'ExactSolution', X) uses the exact solution 'X' to
 %   compute global error at each step. Also, the exact solution is plotted
@@ -126,7 +127,7 @@ arguments
     beta   (:,1) double {mustBeReal, mustBeOfSameRowSize(alpha, beta, {'alpha', 'beta'})} = []
     
     options.Method (1,:) char {mustBeMember(options.Method, ...
-        {'AB(2)','AB(3)','AB(4)','AB(5)'})}
+        {'AB(2)','AB(3)','AB(4)','AB(5)','AB(6)'})}
     options.ExactSolution           (1,1) function_handle ...
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
         mustBeOfPrescribedForm(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
@@ -136,12 +137,13 @@ arguments
 end
 
 % Initialize library methods:
-map_keys = {'AB(2)','AB(3)','AB(4)','AB(5)'};
+map_keys = {'AB(2)','AB(3)','AB(4)','AB(5)','AB(6)'};
 map_vals = {...
     [0,-1;-1/2,3/2], ... %AB(2)
     [0,0,-1;5/12,-16/12,23/12], ... %AB(3)
     [0,0,0,-1;-9/24,37/24,-59/24,55/24], ... %AB(4)
-    [0,0,0,0,-1;251/720,-1274/720,2616/720,-2774/720,1901/720]};  %AB(5)
+    [0,0,0,0,-1;251/720,-1274/720,2616/720,-2774/720,1901/720], ...  %AB(5)
+    [0,0,0,0,0,-1;1/1440*[-475,2877,-7298,9982,-7923,4277]]};  %AB(6)
 
 methods_container = containers.Map(map_keys, map_vals);
 
@@ -175,16 +177,25 @@ end
 
 % Determine the dimension of x0
 [state_count, ic_count] = size(x0);
+% k is the step count of the LMM
 k = numel(alpha);
+if ic_count > k
+    warning([sprintf('Too many ICs are supplied: size(x0,2)=%d > step-size=%d \n \t', ic_count, k), ...
+         'x0 is truncated to match the step-size (k) of the method.']);
+    x0 = x0(:, 1:k);
+    ic_count = k;
+end
+
+% to compute other ICs for the system, we should start at t0_ic
 t0_ic = t(1) + h*(ic_count-1);
 tf_ic = t(1) + h*(k-1);
 
 % Use Euler's method to compute ICs for LMM
 rest_ic = tsp(f, [t0_ic, tf_ic], x0(:,end), h);
 X0 = [x0, rest_ic.xn(2:end,:).'];
-if ic_count > k
-    warning('x0 is truncated to match the step-size (k) of the method.');
-end
+supplied_ic_count = size(x0, 2);
+computed_ic_count = size(rest_ic.xn(2:end,:).', 2);
+
 
 % discretize the time domain:
 N = round((t(end)-t(1))/h); % number of time intervals
@@ -231,11 +242,17 @@ for i=1:steps_count
     end
 end
 
+% Construct the output table by reporting relevant results
 rest = table(index_seq', t_seq', x_seq', 'VariableNames', {'n', 'tn', 'xn'});
 if is_exact_available
     % concat GE if it is available
     rest = [rest, table(GE', 'VariableNames', {'GE'})];
 end
+% Add comment column
+comment = [repmat("IC", supplied_ic_count,1); repmat("Euler", computed_ic_count,1); ...
+    repmat("", size(rest,1)-(computed_ic_count+supplied_ic_count), 1)];
+rest = [rest, table(comment, 'VariableNames', {'Comment'})];
+
 
 %% If PlotResult is enabled
 if options.PlotResult

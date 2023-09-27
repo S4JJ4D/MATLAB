@@ -41,7 +41,7 @@ table([.2;.1], round(1e3*[TS2;TS1],1), round(1e3*[ABE_2;ABE_1],1), round(1e3*[AB
 
 h = .2;
 t = [0 4];
-x0 = 1;
+x0 = [1 1.3 3];
 
 rest = lmm(f, t, x0, h, alpha, beta, 'ExactSolution', x, 'PlotResult', true, 'PauseDuration', .05)
 
@@ -51,7 +51,9 @@ close all;
 
 h = .1;
 t = [0 5];
-x0 = [1;2];
+% two ICs are provided, the rest will be computed using explicit Euler's
+% method
+x0 = [[1;2], [(1+2*h);(2-h)]];
 % define slope function
 
 % ODE
@@ -68,4 +70,22 @@ beta = [251/720, -1274/720, 2616/720, -2774/720, 1901/720]';
 %     "PlotResult", true, "PauseDuration", .02)
 
 rest=lmm(f, t, x0, h, 'Method', 'AB(5)', "ExactSolution", x, ...
+    "PlotResult", true, "PauseDuration", .02)
+
+%%
+clear;
+close all;
+
+h = .1;
+t = [0 4];
+% IC at t=0 is provided, the rest will be computed using explicit Euler's
+% method
+x0 = [1;2];
+% define slope function
+
+% ODE
+f = @(x,t) [-t.*x(1).*x(2); -x(1).^2];
+
+
+rest=lmm(f, t, x0, h, 'Method', 'AB(2)', ...
     "PlotResult", true, "PauseDuration", .02)
