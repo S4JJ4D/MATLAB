@@ -15,6 +15,13 @@ for t=0:.01:1*pi
     set(plt, 'XData', [plt.XData, real(zs).'], 'YData', [plt.YData, imag(zs).']);
 end
 
+% X = plt.XData;
+% X1 = [X(4:2:316), X(317:2:end), X(3:2:315), X(316:2:end)];
+% figure; plot(X1);
+
+% Y = plt.YData;
+% Y1 = [Y(2:2:316), Y(317:2:end), Y(1:2:315), Y(318:2:end)];
+% figure; plot(Y1);
 plt.Visible = 'on'; 
 axis equal;
 axis([-7.2625    2.3671   -3.5986    3.9964]);
@@ -35,12 +42,22 @@ slider_txt = annotation(fg,'textbox',...
     'FontSize',12,...
     'FitBoxToText','off');
 
+annotation(fg,'textbox',...
+    [0.532142857142854 0.942857142857146 0.162500000000001 0.0357142857142857],...
+    'VerticalAlignment','middle',...
+    'String','$\gamma_{c} = 1/\sqrt{2}$',...
+    'LineStyle','none',...
+    'Interpreter','latex',...
+    'FontSize',12,...
+    'FitBoxToText','off');
+
 
 xlabel('Re\{z\}', 'Interpreter', 'latex');
 ylabel('Im\{z\}', 'Interpreter', 'latex');
 lgd = legend('Interpreter', 'latex', 'FontSize', 13);
 
 % pre-allocate data
+
 gamma_vec = 0:.01:.9;
 N = numel(gamma_vec);
 t_vec = 0:.01:1*pi;
@@ -61,6 +78,10 @@ j = j + 1;
 end
 
 
+
+% patch('XData', X1, 'YData', Y1, 'FaceColor', '#CFDAE9', 'EdgeColor', '#5E81B5', ...
+%     'LineWidth', 2);
+
 slider = uicontrol('Style', 'slider', 'Position', [102,396,184,20]);
 set(slider, 'Units', 'normalized', 'Min', 0, 'Max', .9, ...
     'UserData', {plt, Xroots, Yroots, gamma_vec, slider_txt});
@@ -73,7 +94,8 @@ for gamma = gamma_vec
     pause(.01);
 end
 
-function sliderCB(~,event)
+function sliderCB(src,event)
+
 a = event.AffectedObject.Value;
 plt = event.AffectedObject.UserData{1};
 Xroots = event.AffectedObject.UserData{2};
