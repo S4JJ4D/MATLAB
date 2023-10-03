@@ -231,6 +231,8 @@ if isfield(options, 'ExactSolution')
     end
 end
 
+% --------------------------------------------------------
+% Main Loop: States are evolved within the following loop
 steps_count = (N-(k-1));
 for i=1:steps_count
     x_seq(:, i+k) = -x_seq(:, i:i+k-1)*alpha  + h*xp_seq(:, i:i+k-1)*beta;
@@ -241,6 +243,7 @@ for i=1:steps_count
         GE(:, i+k) = x_exact_seq(:, i+k) - x_seq(:, i+k);
     end
 end
+ % --------------------------------------------------------
 
 % Construct the output table by reporting relevant results
 rest = table(index_seq', t_seq', x_seq', 'VariableNames', {'n', 'tn', 'xn'});
@@ -254,6 +257,7 @@ comment = [repmat("IC", supplied_ic_count,1); repmat("Euler", computed_ic_count,
 rest = [rest, table(comment, 'VariableNames', {'Comment'})];
 
 
+% ---------------------------------------------------------------------------------
 %% If PlotResult is enabled
 if options.PlotResult
     % open up a figure and start drawing

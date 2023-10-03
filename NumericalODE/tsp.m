@@ -189,6 +189,8 @@ end
 
 cfs = (((h*ones(1,ts_order)).^(1:ts_order)) ./ factorial(1:ts_order)).';
 
+% --------------------------------------------------------
+% Main Loop: States are evolved within the following loop
 for i=1:N
     x_seq(:, i+1) = x_seq(:, i) + F(x_seq(:,i), t_seq(i)) * cfs;
     xp_seq(:,i+1,:) = F(x_seq(:,i+1), t_seq(i+1));
@@ -202,7 +204,9 @@ for i=1:N
         LTE(:, i+1) = x_exact_seq(:, i+1) - (x_exact_seq(:, i) +F(x_exact_seq(:,i), t_seq(i)) * cfs);
     end
 end
+% --------------------------------------------------------
 
+% Construct the output table by reporting relevant results
 rest = table(index_seq', t_seq', x_seq', 'VariableNames', {'n', 'tn', 'xn'});
 if is_exact_available
     % concat GE if it is available
@@ -213,6 +217,7 @@ if report_lte
 end
 
 
+% ---------------------------------------------------------------------------------
 %% If PlotResult is enabled
 if options.PlotResult
     % open up a figure and start drawing
