@@ -1,13 +1,13 @@
 function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %LMM   Explicit Linear Multi-step Method For Numerically Solving ODEs.
 %
-%   LMM(F, T, X0, H, ALPHA, BETA) computes the approximation points {x_n}
-%   for the given gradient function f in the time-span specified by t, 
-%   starting from the initial condition x0. Approximate solutions are 
-%   evaluated at time instants separated by time-step h. ALPHA and BETA
+%   LMM(F,T,X0,H,ALPHA,BETA) computes the approximation points {x_n}
+%   for the given gradient function F in the time-span specified by T, 
+%   starting from the initial condition X0. Approximate solutions are 
+%   evaluated at time instants separated by time-step H. ALPHA and BETA
 %   vectors are the lmm coefficients used for numerically solving the IVP.
 %
-%   LMM(F, T, X0, H, 'Method', M) uses the predefined lmm method 'M' to
+%   LMM(F,T,X0,H,'Method',M) uses the predefined lmm method M to
 %   numerically solve the IVP. Choices for M are:
 %   'AB(2)'   ---  2-step Adams-Bashforth
 %   'AB(3)'   ---  3-step Adams-Bashforth
@@ -15,14 +15,14 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %   'AB(5)'   ---  5-step Adams-Bashforth
 %   'AB(6)'   ---  6-step Adams-Bashforth
 %
-%   LMM(..., 'ExactSolution', X) uses the exact solution 'X' to
-%   compute global error at each step. Also, the exact solution is plotted
-%   if plotting is enabled.
+%   LMM(..., 'ExactSolution', X) uses the exact solution X to compute
+%   global error at each step. Also, the exact solution is plotted if
+%   plotting option is enabled.
 %
 %   LMM(..., 'PlotResult', true) plots the resulting approximation
 %   values obtained from numerically solving the IVP.
 %
-%   LMM(..., 'PauseDuration', P) Specifies a the duration of pause (in
+%   LMM(..., 'PauseDuration', P) Specifies the duration of pause (in
 %   seconds) within the animation loop of plotting.
 %
 %   the general equation of a k-step explicit lmm, involves 2k
@@ -119,7 +119,7 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %   See also TSP.
 
 arguments
-    f      (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedForm(f, '@(x,t)')} % a column vector [f] representing the gradient function x'
+    f      (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedSignature(f, '@(x,t)')} % a column vector [f] representing the gradient function x'
     t      (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
     x0     (:,:) double {mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % matrix of initial conditions: number of rows must match the number of states within the system
     h      (1,1) double {mustBeReal, mustBeNonempty, mustBePositive} % time-step
@@ -130,10 +130,10 @@ arguments
         {'AB(2)','AB(3)','AB(4)','AB(5)','AB(6)'})}
     options.ExactSolution           (1,1) function_handle ...
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
-        mustBeOfPrescribedForm(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
+        mustBeOfPrescribedSignature(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
         mustBeOfCompatibleSizeWithFcn(x0, options.ExactSolution, {'x0', 'options.ExactSolution'})}
     options.PlotResult              (1,1) logical = false;
-    options.PauseDuration           (1,1) {mustBeReal, mustBeNonnegative} = .1;
+    options.PauseDuration           (1,1) {mustBeReal, mustBeNonempty, mustBeNonnegative} = .1;
 end
 
 % Initialize library methods:
@@ -337,11 +337,11 @@ if nargin(f) ~= argcount
 end
 end
 
-function mustBeOfPrescribedForm(f, form)
+function mustBeOfPrescribedSignature(f, form)
 f_str = func2str(f);
 if ~strcmp(f_str(1:numel(form)), form)
     form_bold = ['<strong>', form, '</strong>'];
-    erridType = 'mustBeOfPrescribedForm:NoArgFormTemplateMatch';
+    erridType = 'mustBeOfPrescribedSignature:NoArgFormTemplateMatch';
     msgType = ['Function handle input argument must be of the form ', ...
         form_bold, '.'];
     throwAsCaller(MException(erridType,msgType))
