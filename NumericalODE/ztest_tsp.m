@@ -16,13 +16,13 @@ x = @(t) 1./(1+4*exp(2*(10-t)));
 % FIXED STEP-SIZE
 [rest, xp_seq] = tsp(F1, timespan, x0, h, 'ExactSolution', x, ...
     'PlotResult', true, 'PauseDuration', .04, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true);
+    'ReportLTE', true, 'ReportGE', true);
 rest
 
 % ADAPTIVE STEP-SIZE
 [rest, ~] = tsp(F2, timespan, x0, [], 1e-2, 'ExactSolution', x, ...
     'PlotResult', true, 'PauseDuration', .04, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true)
+    'ReportLTE', true, 'ReportGE', true)
 
 %% Verification: Example 3.3 TS(2)
 close all;
@@ -44,12 +44,12 @@ x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
 % FIXED STEP-SIZE
 [rest, xp_seq] = tsp(F2, timespan, x0, h, 'ExactSolution', x, ...
     'PauseDuration', .03, 'PlotResult', true, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true);
+    'ReportLTE', true, 'ReportGE', true);
 rest
 % ADAPTIVE STEP-SIZE
 [rest, ~] = tsp(F3, timespan, x0, [], 1e-3, 'ExactSolution', x, ...
     'PauseDuration', .03, 'PlotResult', true, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true)
+    'ReportLTE', true, 'ReportGE', true)
 
 
 %% Custom
@@ -68,13 +68,13 @@ F4 = @(x,t) [(1-2*t).*x, (-2 + (1-2*t).^2).*x, (-6 + (1-2*t).^2).*(1-2*t).*x, ..
 x = @(t) exp(1/4 - (1/2 - t).^2);
 
 % FIXED STEP-SIZE
-tsp(F1, timespan, x0, h, 'ExactSolution', x, ...
+rest = tsp(F1, timespan, x0, h, 'ExactSolution', x, ...
     'PauseDuration', .02, 'PlotResult', true, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true);
+    'ReportLTE', true, 'ReportGE', true)
 % ADAPTIVE STEP-SIZE
-[rest, xp_seq] = tsp(F2, timespan, x0, [], 1e-2, 'ExactSolution', x, ...
+[rest, xp_seq] = tsp(F4, timespan, x0, [], 1e-3, 'ExactSolution', x, ...
     'PauseDuration', .02, 'PlotResult', true, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true);
+    'ReportLTE', true, 'ReportGE', true);
 rest
 
 %% Custom
@@ -98,7 +98,7 @@ x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
 % FIXED STEP-SIZE
 [rest, xp_seq] = tsp(F, timespan, x0, h, 'ExactSolution', x, ...
     'PauseDuration', .04, 'PlotResult', true, 'PlotInterpolatingCurve', true, ...
-    'ReportLTE', true);
+    'ReportLTE', true, 'ReportGE', true);
 rest
 
 %% Custom
