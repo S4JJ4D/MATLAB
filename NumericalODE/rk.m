@@ -101,12 +101,14 @@ function [rest, MISC]=rk(f, t, x0, h, tol, A, b, c, options)
 %
 %       EXAMPLE #1
 %       ----------
+%
 %       f = @(x,t) [-t.*x(1).*x(2);-x(1).^2];
 %       rest = rk(f, [0,4], [1;2], .1, [], 'Method', 'RK2I', ...
 %            'PauseDuration', .05, 'PlotResult', true)
 %
 %       EXAMPLE #2
 %       ----------
+%
 %       f = @(x,t) (1-2*t).*x;
 %       x = @(t) exp(1/4 - (1/2 - t).^2);
 %       rest = rk(f, [0,4], 1, .2, [], [0 0;1/2 0], [0 1], [0 1/2], ...

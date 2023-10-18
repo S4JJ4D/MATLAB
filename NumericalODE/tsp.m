@@ -145,6 +145,7 @@ function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 %   
 %       EXAMPLE #3 (TS(3), Variable-Step, Vector-Valued States)
 %       ----------
+%
 %       F = @(x,t) [x(2), t-x(1), 1-x(2), x(1)-t; ...
 %                 t-x(1), 1-x(2), x(1)-t, -1+x(2)];
 %       x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
@@ -185,7 +186,7 @@ function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 %   
 %       Example #6 (TS(2), Fixed-Step, Complex-Valued Scalar States)
 %       ----------
-%   
+%
 %       F = @(x,t) [1j*x, -x];
 %       x = @(t) exp(1j*t)
 %       [rest, ~] = tsp(F, [0 5], 1+0j, .1, ...

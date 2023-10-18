@@ -112,6 +112,7 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %
 %       EXAMPLE #1
 %       ----------
+%
 %       f = @(x,t) [x(2); t-x(1)];
 %       x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1]; 
 %       [rest, xp_seq] = lmm(f, [0 5], [1;2], .1, 'Method', 'AB(5)', ...
