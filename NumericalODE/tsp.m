@@ -1,6 +1,13 @@
 function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 %TSP   p-th Order Taylor Series Numerical Method For Solving ODEs.
 %
+%   This function aims to numerically solve IVPs of the following form
+%   using the Taylor series methods.
+%
+%                         x'(t) = f(x(t),t)    t Є [t0, tf]
+%                         x(0) = x0
+%
+%   <strong>SYNTAX</strong>:
 %   TSP(F,T,X0,H) computes the approximation points {x_n} for the given
 %   gradient function F in the time-span specified by t, starting from the
 %   initial condition x0. Approxmation values are evaluated at time
@@ -42,10 +49,10 @@ function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 %   the information for the state variables and the 3rd dimension (to the
 %   plane) holds the derivatives of higher orders.
 %
-%
+%   <strong>DESCRIPTION</strong>:
 %   F must be a function handle with a signature of the form @(x,t).
 %   In general, F is a matrix-valued function whose columns are the
-%   consecutive derivatives of x up to a certain order:
+%   consecutive derivatives of x. As a result, the general form of F is
 %   F = [f1, f2, f3, ..., fp] where fi is a column vector representing
 %   the i'th derivate of the state vector x. The number of columns, p,
 %   determines the order of TS method to be used in the function.
@@ -55,6 +62,20 @@ function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 %   uses TS(3) method to compute the approximation to the solution of the
 %   IVP.
 %
+%   T is the interval of integration, specified as a two-element vector of
+%   the general form [t0 tf] where t0 and tf denote initial and final
+%   times, respectively.
+%
+%   X0 is the initial conditions vector. X0 must be the same length as the
+%   vector output of F, so that X0 contains an initial condition for each 
+%   equation defined in IVP.
+%
+%   H is the step size of the integration, used in fixed-step numerical
+%   schemes, specified as a positive scalar value.
+%
+%   TOL is the LTE tolerance value specified as a positive scalar value.
+%
+%   
 %   LTE at each time point t_{n+1} is obtained by subtracting the exact
 %   value of the solution at that time z(t_{n+1}) from its approximation
 %   which is obtained using a truncated version of Taylor expansion.
@@ -91,64 +112,98 @@ function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 %
 %
 %   NOTES:
-%   
-%   1. Since the computation of LTE/GE imposes additional computational
+%
+%   * Since the computation of LTE/GE imposes additional computational
 %   burden, it is left as an option to the user to enable/disable it.
 %   ----------------------------------------------------------------------
 %
-%   EXAMPLE #1
-%   ----------
+%   Examples:
 %
-%   F = @(x,t) 2*x*(1-x);
-%   x = @(t) 1./(1+4*exp(2*(10-t)));
-%   [rest, xp_seq] = tsp(F, [10 13], 1/5, .2, ...
-%                        'ExactSolution', x, ...
-%                        'PlotResult', true, ...
-%                        'PauseDuration', .05, ...
-%                        'PlotInterpolatingCurve', true)
+%       EXAMPLE #1 (TS(1), Fixed-Step, Scalar-Valued States)
+%       ----------
+%   
+%       F = @(x,t) 2*x*(1-x);
+%       x = @(t) 1./(1+4*exp(2*(10-t)));
+%       [rest, xp_seq] = tsp(F, [10 13], 1/5, .2, ...
+%                            'ExactSolution', x, ...
+%                            'PlotResult', true, ...
+%                            'PauseDuration', .05, ...
+%                            'PlotInterpolatingCurve', true)
+%   
+%       EXAMPLE #2 (TS(3), Fixed-Step, Vector-Valued States)
+%       ----------
+%   
+%       F = @(x,t) [[x(2);t-x(1)], ...
+%                   [t-x(1);1-x(2)], ...
+%                   [1-x(2);x(1)-t]];
+%       x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
+%       [rest, ~] = tsp(F, [0 3], [1;2], .1, ...
+%                       'ExactSolution', x, ...
+%                       'PauseDuration', .05, ...
+%                       'PlotResult', true, ...
+%                       'PlotInterpolatingCurve', true)
+%   
+%       EXAMPLE #3 (TS(3), Variable-Step, Vector-Valued States)
+%       ----------
+%       F = @(x,t) [x(2), t-x(1), 1-x(2), x(1)-t; ...
+%                 t-x(1), 1-x(2), x(1)-t, -1+x(2)];
+%       x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
+%       [rest, ~] = tsp(F, [0 8], [1;2], [], 1e-3, ...
+%                      'ExactSolution', x, ...
+%                      'PauseDuration', .04, ...
+%                      'PlotResult', true, ...
+%                      'PlotInterpolatingCurve', true, ...
+%                      'ReportLTE', true, 'ReportGE', true)
 %
-%   EXAMPLE #2
-%   ----------
-%
-%   F = @(x,t) [[x(2);t-x(1)], ...
-%               [t-x(1);1-x(2)], ...
-%               [1-x(2);x(1)-t]];
-%   x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
-%   [rest, ~] = tsp(F, [0 3], [1;2], .1, ...
-%                   'ExactSolution', x, ...
-%                   'PauseDuration', .05, ...
-%                   'PlotResult', true, ...
-%                   'PlotInterpolatingCurve', true)
-%
-%   EXAMPLE #3
-%   ----------
-%
-%   F = @(x,t) [[x(2);x(3);-2*x(1)-x(2)-2*x(3)+(1-2*t)], ...
-%               [x(3);-2*x(1)-x(2)-2*x(3)+(1-2*t);4*x(1)+3*x(3)+4*t-4]];
-%   x = @(t) [2*sin(t) - t + 1; 2*cos(t) - 1; -2*sin(t)];
-%   [rest, ~] = tsp(F, [0 5], [1;1;0], .2, ...
-%                   'ExactSolution', x, ...
-%                   'PauseDuration', .05, ...
-%                   'PlotResult', true, ...
-%                   'PlotInterpolatingCurve', true)
-%
-%   Example #4
-%   ----------
-%
-%   F = @(x,t) ...
-%       [x(2); -x(1)./(sqrt(x(1).^2 + x(3).^2)).^3;
-%        x(4); -x(3)./(sqrt(x(1).^2 + x(3).^2))^3];
-%   [rest, ~] = tsp(F, [0 10], [2;0;0;.5], .2, ...
-%                   'PauseDuration', .02, ...
-%                   'PlotResult', true, ...
-%                   'PlotInterpolatingCurve', true)
 %   ----------------------------------------------------------------------
 %
+%   See also LMM, RK.
+    
+%       EXAMPLE #4 (TS(2), Fixed-Step, Vector-Valued States)
+%       ----------
+%   
+%       F = @(x,t) [[x(2);x(3);-2*x(1)-x(2)-2*x(3)+(1-2*t)], ...
+%                  [x(3);-2*x(1)-x(2)-2*x(3)+(1-2*t);4*x(1)+3*x(3)+4*t-4]];
+%       x = @(t) [2*sin(t) - t + 1; 2*cos(t) - 1; -2*sin(t)];
+%       [rest, ~] = tsp(F, [0 5], [1;1;0], .2, ...
+%                       'ExactSolution', x, ...
+%                       'PauseDuration', .05, ...
+%                       'PlotResult', true, ...
+%                       'PlotInterpolatingCurve', true)
+%   
+%   
+%       Example #5 (TS(1), Fixed-Step, Vector-Valued States)
+%       ----------
+%   
+%       F = @(x,t) ...
+%           [x(2); -x(1)./(sqrt(x(1).^2 + x(3).^2)).^3;
+%            x(4); -x(3)./(sqrt(x(1).^2 + x(3).^2))^3];
+%       [rest, ~] = tsp(F, [0 10], [2;0;0;.5], .2, ...
+%                       'PauseDuration', .02, ...
+%                       'PlotResult', true, ...
+%                       'PlotInterpolatingCurve', true)
+%   
+%       Example #6 (TS(2), Fixed-Step, Complex-Valued Scalar States)
+%       ----------
+%   
+%       F = @(x,t) [1j*x, -x];
+%       x = @(t) exp(1j*t)
+%       [rest, ~] = tsp(F, [0 5], 1+0j, .1, ...
+%                       'ExactSolution', x, ...
+%                       'PauseDuration', .02, ...
+%                       'PlotResult', true, ...
+%                       'PlotInterpolatingCurve', true)
+%
+%   ----------------------------------------------------------------------
+%   
+
+%	S.K Monfared 23/10/18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% TODO %%%%%%%%%%%%%%%%%%%%%%%%%%
 % - Enh: use a preallocation technique in adaptive step-size method
 % - Enh: implement "options.ReportLTEestimate using a higher-order method
 
+%% Function Arguments
 arguments
     F   (1,1) function_handle {mustBeAFunctionOfNArguments(F, 2, '@(x,t)'), mustBeOfPrescribedSignature(F, '@(x,t)')} % a matrix containing gradient functions [f1, f2, ..., fp] where fi is the i'th derivative of x
     t   (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
@@ -279,7 +334,7 @@ if ~is_adaptive_step_size_mode
     end
     % --------------------------------------------------------
 
-    rest = table(index_seq', t_seq', x_seq', 'VariableNames', {'n', 'tn', 'xn'});
+    rest = table(index_seq.', t_seq.', x_seq.', 'VariableNames', {'n', 'tn', 'xn'});
     if report_ge
         % concat GE if it is available
         rest = [rest, table(GE.', 'VariableNames', {'GE'})];
@@ -371,7 +426,7 @@ else
 
     % Construct the output table by reporting relevant results
     index_seq = 0:numel(t_seq)-1;
-    rest = table(index_seq', h_seq', t_seq', x_seq', LTE_estimate.', 'VariableNames', {'n', 'hn', 'tn', 'xn', 'LTE (Estimate)'});
+    rest = table(index_seq.', h_seq.', t_seq.', x_seq.', LTE_estimate.', 'VariableNames', {'n', 'hn', 'tn', 'xn', 'LTE (Estimate)'});
     if report_ge
         % concat GE if available
         rest = [rest, table(GE.', 'VariableNames', {'GE'})];
@@ -395,6 +450,10 @@ end
 
 % if plotting is enabled
 if options.PlotResult
+    iscomplex = false;
+    if ~isreal(x_seq)
+        iscomplex = true;
+    end
     % open up a figure and start drawing
     % create a new axes
     figure;
@@ -436,25 +495,53 @@ if options.PlotResult
         x_exact = x(tc);
         for i=1:state_count
             ax = nexttile(i);
-            plot(ax, tc, x_exact(i,:), 'Color', '#071952', 'Tag', ['Exact Solution: Component ', num2str(i)]);
+            plot(ax, tc, real(x_exact(i,:)), 'Color', '#071952', 'Tag', ['Exact Solution:REAL:Component ', num2str(i)], ...
+                'DisplayName', sprintf('$x^{(%d)}(t)$: REAL', i));
+            if iscomplex
+                plot(ax, tc, imag(x_exact(i,:)), 'Color', '#0E1E38', 'Tag', ['Exact Solution:IMAG:Component ', num2str(i)], ...
+                    'DisplayName', sprintf('$x^{(%d)}(t)$: IMAG', i));
+            end
         end
     end
 
     if options.PlotInterpolatingCurve
-        interpolating_curve_plt = gobjects(1, state_count);
+        if iscomplex
+            interpolating_curve_plt = gobjects(1, 2*state_count);
+        else
+            interpolating_curve_plt = gobjects(1, state_count);
+        end
         for i=1:state_count
             ax = nexttile(i);
-            interpolating_curve_plt(i) = plot(ax, rest.tn(1), rest.xn(1, i), 'b-', 'Tag', ['Interpolating Curve: Component ', num2str(i)]);
+            interpolating_curve_plt(i) = plot(ax, rest.tn(1), real(rest.xn(1, i)), 'b-', 'Tag', ['Interpolating Curve:REAL:Component ', num2str(i)], ...
+                'HandleVisibility', 'off');
+            if iscomplex
+                interpolating_curve_plt(i+state_count) = plot(ax, rest.tn(1), imag(rest.xn(1, i)), 'b-', 'Tag', ['Interpolating Curve:IMAGE:Component ', num2str(i)], ...
+                    'HandleVisibility', 'off');
+            end
         end
     end
 
-    x_seq_plt = gobjects(1, state_count);
+
+    if iscomplex
+        x_seq_plt = gobjects(1, 2*state_count);
+    else
+        x_seq_plt = gobjects(1, state_count);
+    end
     for i=1:state_count
         ax = nexttile(i);
-        x_seq_plt(i) = plot(ax, rest.tn(1), rest.xn(1, i), ...
+        x_seq_plt(i) = plot(ax, rest.tn(1), real(rest.xn(1, i)), ...
             'LineStyle', 'none', 'Marker', 'o', ...
             'MarkerEdgeColor', 'b', 'MarkerFaceColor', 'w', ...
-            'MarkerSize', 6, 'Tag', ['Approximation Sequence {x_n}: Component ', num2str(i)]);
+            'MarkerSize', 6, 'Tag', ['Approximation Sequence {x_n}:REAL:Component ', num2str(i)], ...
+            'DisplayName', sprintf('$x^{(%d)}_{n}$: REAL', i));
+
+        if iscomplex
+            x_seq_plt(i+state_count) = plot(ax, rest.tn(1), imag(rest.xn(1, i)), ...
+                'LineStyle', 'none', 'Marker', 'o', ...
+                'MarkerEdgeColor', '#16262e', 'MarkerFaceColor', '#9fa3b2', ...
+                'MarkerSize', 6, 'Tag', ['Approximation Sequence {x_n}:IMAG:Component ', num2str(i)], ...
+                'DisplayName', sprintf('$x^{(%d)}_{n}$: IMAG', i));
+        end
     end
 
     % initial pause
@@ -465,7 +552,7 @@ if options.PlotResult
         if options.PlotInterpolatingCurve
             hh = .02*h_seq(i);
             x_int = 0:hh:h_seq(i);
-            y_int = rest.xn(i,:)';
+            y_int = rest.xn(i,:).';
             for j=1:ts_order
                 y_int = y_int + 1/factorial(j) * xp_seq(:, i, j) * (x_int.^j);
             end
@@ -473,17 +560,34 @@ if options.PlotResult
             for j=1:state_count
                 set(interpolating_curve_plt(j), ...
                     'XData', [interpolating_curve_plt(j).XData, rest.tn(i) + x_int], ...
-                    'YData', [interpolating_curve_plt(j).YData, y_int(j, :)]);
+                    'YData', [interpolating_curve_plt(j).YData, real(y_int(j, :))]);
+                if iscomplex
+                    set(interpolating_curve_plt(j+state_count), ...
+                        'XData', [interpolating_curve_plt(j+state_count).XData, rest.tn(i) + x_int], ...
+                        'YData', [interpolating_curve_plt(j+state_count).YData, imag(y_int(j, :))]);
+                end
             end
         end
         for j=1:state_count
             set(x_seq_plt(j), 'XData', [x_seq_plt(j).XData, rest.tn(i+1)], ...
-                'YData', [x_seq_plt(j).YData, rest.xn(i+1, j)]);
+                'YData', [x_seq_plt(j).YData, real(rest.xn(i+1, j))]);
+            if iscomplex
+                set(x_seq_plt(j+state_count), 'XData', [x_seq_plt(j+state_count).XData, rest.tn(i+1)], ...
+                    'YData', [x_seq_plt(j+state_count).YData, imag(rest.xn(i+1, j))]);
+            end
         end
         if pause_duration ~=0
             pause(pause_duration);
         end
     end
+
+    % insert legend
+%     if iscomplex
+%         for i=1:state_count
+%             nexttile(i);
+%             legend('Interpreter', 'latex', 'FontSize', 10);
+%         end
+%     end
 end
 
 end

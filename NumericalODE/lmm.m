@@ -1,6 +1,13 @@
 function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %LMM   Explicit Linear Multi-step Method For Numerically Solving ODEs.
 %
+%   This function aims to numerically solve IVPs of the following form
+%   using explicit linear multi-step methods.
+%
+%                         x'(t) = f(x(t),t)    t Є [t0, tf]
+%                         x(0) = x0
+%
+%   <strong>SYNTAX</strong>:
 %   LMM(F,T,X0,H,ALPHA,BETA) computes the approximation points {x_n}
 %   for the given gradient function F in the time-span specified by T, 
 %   starting from the initial condition X0. Approximate solutions are 
@@ -25,6 +32,7 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %   LMM(..., 'PauseDuration', P) Specifies the duration of pause (in
 %   seconds) within the animation loop of plotting.
 %
+%   <strong>DESCRIPTION</strong>:
 %   the general equation of a k-step explicit lmm, involves 2k
 %   coefficients {alpha_i, beta_i} where i spans from 0 to k-1. The general
 %   formula of a k-step explicit lmm is as follows, where f is the
@@ -50,7 +58,6 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %                                                         of previous
 %                                                         values and
 %                                                         derivatives
-%
 %
 %   A k-step lmm requires k initial conditions. The stariting inital
 %   condition x_{0} is specified to be x(0): the IC of IVP. The rest of
@@ -99,24 +106,22 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %      └──────────────────────────────────────────────────────▶b_{k-1}│
 %                                                             ╰─     ─╯
 %
+%   -------------------------------------------------------------------
 %
+%   Examples:
+%
+%       EXAMPLE #1
+%       ----------
+%       f = @(x,t) [x(2); t-x(1)];
+%       x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1]; 
+%       [rest, xp_seq] = lmm(f, [0 5], [1;2], .1, 'Method', 'AB(5)', ...
+%                            'ExactSolution', x, ...
+%                            'PlotResult', true, ...
+%                            'PauseDuration', .02)
 %
 %   ----------------------------------------------------------------------
-%   Example [1]
 %
-%   f = @(x,t) [x(2); t-x(1)];
-%   x = @(t) [t + cos(t) + sin(t);cos(t) - sin(t) + 1];
-%   % AB(5)
-%   % alpha = [0 0 0 0 -1]';
-%   % beta = [251/720, -1274/720, 2616/720, -2774/720, 1901/720]';
-% 
-%   [rest, xp_seq] = lmm(f, [0 5], [1;2], .1, 'Method', 'AB(5)', ...
-%                        'ExactSolution', x, ...
-%                        'PlotResult', true, ...
-%                        'PauseDuration', .02)
-%   ----------------------------------------------------------------------
-%
-%   See also TSP.
+%   See also TSP, RK.
 
 arguments
     f      (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedSignature(f, '@(x,t)')} % a column vector [f] representing the gradient function x'

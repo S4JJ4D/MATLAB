@@ -2,11 +2,12 @@ function [rest, MISC]=rk(f, t, x0, h, tol, A, b, c, options)
 %RK    Runge-Kutta Method For Numerically Solving ODEs.
 %
 %   This function aims to numerically solve IVPs of the following form
-%   using the family of Runge-Kutta methods.
+%   using the family of explicit Runge-Kutta methods.
 %
 %                         x'(t) = f(x(t),t)    t Є [t0, tf]
 %                         x(0) = x0
 %
+%   <strong>SYNTAX</strong>:
 %   RK(f,t,x0,h,[],A,b,c) computes the approximate solutions {xn} for the
 %   given derivative function f in the time-span specified by t, starting
 %   from the initial condition x0. The time axis is uniformly discretized
@@ -59,7 +60,7 @@ function [rest, MISC]=rk(f, t, x0, h, tol, A, b, c, options)
 %   RK(..., 'ReportGE', true) reports global error in the output. This
 %   options is only effective when an exact solution is available.
 %
-%   RK(..., 'ReportLTE', true) Also reports local truncation error in the
+%   RK(..., 'ReportLTE', true) also reports local truncation error in the
 %   output. This option is only effective when an exact solution is
 %   available.
 %
@@ -92,7 +93,7 @@ function [rest, MISC]=rk(f, t, x0, h, tol, A, b, c, options)
 %
 %   NOTES:
 %   
-%   1. Since the computation of LTE/GE imposes additional computational
+%   * Since the computation of LTE/GE imposes additional computational
 %   burden, it is left as an option to the user to enable/disable it.
 %   -------------------------------------------------------------------
 %
@@ -101,27 +102,29 @@ function [rest, MISC]=rk(f, t, x0, h, tol, A, b, c, options)
 %       EXAMPLE #1
 %       ----------
 %       f = @(x,t) [-t.*x(1).*x(2);-x(1).^2];
-%
 %       rest = rk(f, [0,4], [1;2], .1, [], 'Method', 'RK2I', ...
 %            'PauseDuration', .05, 'PlotResult', true)
-%
 %
 %       EXAMPLE #2
 %       ----------
 %       f = @(x,t) (1-2*t).*x;
 %       x = @(t) exp(1/4 - (1/2 - t).^2);
-%
 %       rest = rk(f, [0,4], 1, .2, [], [0 0;1/2 0], [0 1], [0 1/2], ...
 %         'ExactSolution', x, 'ReportGE', true, 'ReportLTE', true, ...
 %         'PauseDuration', .05, 'PlotResult', true)
 %
+%   ----------------------------------------------------------------------
 %
+%   See also TSP, LMM.
+
+%	S.K Monfared 23/10/18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% TODO %%%%%%%%%%%%%%%%%%%%%%%%%%
 % - Enh: implement adaptive step-size method
 % - Enh: use a preallocation technique in adaptive step-size method
 % - Enh: implement "options.ReportLTEestimate using a higher-order method
 
+%% Function Arguments
 arguments
     f   (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedSignature(f, '@(x,t)')} % a matrix containing gradient functions [f1, f2, ..., fp] where fi is the i'th derivative of x
     t   (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
