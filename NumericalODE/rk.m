@@ -129,13 +129,13 @@ function [rest, MISC]=rk(f, t, x0, h, tol, A, b, c, options)
 %% Function Arguments
 arguments
     f   (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedSignature(f, '@(x,t)')} % a matrix containing gradient functions [f1, f2, ..., fp] where fi is the i'th derivative of x
-    t   (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
-    x0  (:,1) double {mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % vector of initial conditions
-    h   (:,:) double {mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % time-step
-    tol (:,:) double {mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % tolerance
-    A   (:,:) double {mustBeReal, mustBeNonNan, mustBeSquareArray, mustBeStrictlyLowerTriangular} = []
-    b   (:,1) double {mustBeReal, mustBeNonNan, mustBeOfCompatibleSizeWithArray(b, A, {'b', 'A'})} = []
-    c   (:,1) double {mustBeReal, mustBeNonNan, mustBeOfCompatibleSizeWithArray(c, A, {'c', 'A'})} = []
+    t   (2,1) double {mustBeFinite, mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
+    x0  (:,1) double {mustBeFinite, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % vector of initial conditions
+    h   (:,:) double {mustBeFinite, mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % time-step
+    tol (:,:) double {mustBeFinite, mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % tolerance
+    A   (:,:) double {mustBeFinite, mustBeReal, mustBeSquareArray, mustBeStrictlyLowerTriangular} = []
+    b   (:,1) double {mustBeFinite, mustBeReal, mustBeOfCompatibleSizeWithArray(b, A, {'b', 'A'})} = []
+    c   (:,1) double {mustBeFinite, mustBeReal, mustBeOfCompatibleSizeWithArray(c, A, {'c', 'A'})} = []
 
     options.Method (1,:) char {mustBeMember(options.Method, ...
         {'RK2I', 'RK2M', 'RK2R', 'RK3H', 'RK3K', 'RK3R', 'RK4'})}
@@ -143,7 +143,7 @@ arguments
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
         mustBeOfPrescribedSignature(options.ExactSolution, '@(t)'), ... % exact analytical solution @(t)
         mustBeOfCompatibleSizeWithFcn(x0, options.ExactSolution, {'x0', 'options.ExactSolution'})}
-    options.PauseDuration           (1,1) {mustBeReal, mustBeNonempty, mustBeNonnegative} = .05;
+    options.PauseDuration           (1,1) {mustBeFinite, mustBeReal, mustBeNonempty, mustBeNonnegative} = .05;
     options.PlotResult              (1,1) logical = false;
     options.PlotSteps               (1,1) logical = false;
     options.ReportLTE               (1,1) logical = false;

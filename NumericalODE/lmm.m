@@ -32,6 +32,9 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %   LMM(..., 'PauseDuration', P) Specifies the duration of pause (in
 %   seconds) within the animation loop of plotting.
 %
+%   LMM(..., 'ReportGE', true) reports global error in the output. This
+%   options is only effective when an exact solution is available.
+%
 %   <strong>DESCRIPTION</strong>:
 %   the general equation of a k-step explicit lmm, involves 2k
 %   coefficients {alpha_i, beta_i} where i spans from 0 to k-1. The general
@@ -106,6 +109,10 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %      └──────────────────────────────────────────────────────▶b_{k-1}│
 %                                                             ╰─     ─╯
 %
+%   NOTES:
+%
+%   * Since the computation of LTE/GE imposes additional computational
+%   burden, it is left as an option to the user to enable/disable it.
 %   -------------------------------------------------------------------
 %
 %   Examples:
@@ -118,19 +125,22 @@ function [rest, xp_seq]=lmm(f, t, x0, h, alpha, beta, options)
 %       [rest, xp_seq] = lmm(f, [0 5], [1;2], .1, 'Method', 'AB(5)', ...
 %                            'ExactSolution', x, ...
 %                            'PlotResult', true, ...
-%                            'PauseDuration', .02)
+%                            'PauseDuration', .02, ...
+%                            'ReportGE', true)
 %
 %   ----------------------------------------------------------------------
 %
 %   See also TSP, RK.
 
+%% Function Arguments
+
 arguments
     f      (1,1) function_handle {mustBeAFunctionOfNArguments(f, 2, '@(x,t)'), mustBeOfPrescribedSignature(f, '@(x,t)')} % a column vector [f] representing the gradient function x'
-    t      (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
-    x0     (:,:) double {mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % matrix of initial conditions: number of rows must match the number of states within the system
-    h      (1,1) double {mustBeReal, mustBeNonempty, mustBePositive} % time-step
-    alpha  (:,1) double {mustBeReal} = []
-    beta   (:,1) double {mustBeReal, mustBeOfSameRowSize(alpha, beta, {'alpha', 'beta'})} = []
+    t      (2,1) double {mustBeFinite, mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
+    x0     (:,:) double {mustBeFinite, mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, f, {'x0', 'f'})} % matrix of initial conditions: number of rows must match the number of states within the system
+    h      (1,1) double {mustBeFinite, mustBeReal, mustBeNonempty, mustBePositive} % time-step
+    alpha  (:,1) double {mustBeFinite, mustBeReal} = []
+    beta   (:,1) double {mustBeFinite, mustBeReal, mustBeOfSameRowSize(alpha, beta, {'alpha', 'beta'})} = []
     
     options.Method (1,:) char {mustBeMember(options.Method, ...
         {'AB(2)','AB(3)','AB(4)','AB(5)','AB(6)'})}
@@ -139,8 +149,26 @@ arguments
         mustBeOfPrescribedSignature(options.ExactSolution, '@(t)'), ... % exact analytical function @(t)
         mustBeOfCompatibleSizeWithFcn(x0, options.ExactSolution, {'x0', 'options.ExactSolution'})}
     options.PlotResult              (1,1) logical = false;
-    options.PauseDuration           (1,1) {mustBeReal, mustBeNonempty, mustBeNonnegative} = .1;
+    options.ReportGE                (1,1) logical = false;
+    options.PauseDuration           (1,1) {mustBeFinite, mustBeReal, mustBeNonempty, mustBeNonnegative} = .1;
 end
+
+%% Initialization
+
+is_exact_available = 0;
+if isfield(options, 'ExactSolution')
+    is_exact_available = 1;
+    x = options.ExactSolution;
+end
+
+report_ge = 0;
+if options.ReportGE && is_exact_available
+    report_ge = 1;
+elseif options.ReportGE && ~is_exact_available
+    warning('GE cannot be computed unless an exact solution is availabe.');
+end
+
+%% Obtaining Approximate Solutions
 
 % Initialize library methods:
 map_keys = {'AB(2)','AB(3)','AB(4)','AB(5)','AB(6)'};
@@ -225,12 +253,7 @@ end
 
 x_exact_seq = zeros(state_count,n_data_points);
 GE = zeros(state_count,n_data_points);
-
-is_exact_available = 0;
-if isfield(options, 'ExactSolution')
-    is_exact_available = 1;
-    x = options.ExactSolution;
-
+if report_ge
     for i=1:k
         x_exact_seq(:, i) = x(t_seq(i));
         GE(:, i) = x_seq(:, i) - x_exact_seq(:, i);
@@ -244,7 +267,7 @@ for i=1:steps_count
     x_seq(:, i+k) = -x_seq(:, i:i+k-1)*alpha  + h*xp_seq(:, i:i+k-1)*beta;
     xp_seq(:, i+k) = f(x_seq(:, i+k), t_seq(i+k));
 
-    if is_exact_available
+    if report_ge
         x_exact_seq(:, i+k) = x(t_seq(i+k));
         GE(:, i+k) = x_exact_seq(:, i+k) - x_seq(:, i+k);
     end
@@ -252,10 +275,10 @@ end
  % --------------------------------------------------------
 
 % Construct the output table by reporting relevant results
-rest = table(index_seq', t_seq', x_seq', 'VariableNames', {'n', 'tn', 'xn'});
-if is_exact_available
+rest = table(index_seq.', t_seq.', x_seq.', 'VariableNames', {'n', 'tn', 'xn'});
+if report_ge
     % concat GE if it is available
-    rest = [rest, table(GE', 'VariableNames', {'GE'})];
+    rest = [rest, table(GE.', 'VariableNames', {'GE'})];
 end
 % Add comment column
 comment = [repmat("IC", supplied_ic_count,1); repmat("Euler", computed_ic_count,1); ...
@@ -265,6 +288,7 @@ rest = [rest, table(comment, 'VariableNames', {'Comment'})];
 
 % ---------------------------------------------------------------------------------
 %% If PlotResult is enabled
+
 if options.PlotResult
     % open up a figure and start drawing
     % create a new axes

@@ -21,19 +21,19 @@ alpha = [0 -1]';
 beta = [-1/2 3/2]';
 
 
-rest=lmm(f, t, 1, h2, alpha, beta, 'ExactSolution', x);
+rest=lmm(f, t, 1, h2, alpha, beta, 'ExactSolution', x, 'ReportGE', true);
 ABE_2 = rest.GE(end);
-rest=lmm(f, t, [1,tri(h2)], h2, alpha, beta, 'ExactSolution', x);
+rest=lmm(f, t, [1,tri(h2)], h2, alpha, beta, 'ExactSolution', x, 'ReportGE', true);
 ABT_2 = rest.GE(end);
-rest = tsp(F, t, 1, h2, 'ExactSolution', x);
+rest = tsp(F, t, 1, h2, 'ExactSolution', x, 'ReportGE', true);
 TS2 = rest.GE(end);
 
 
-rest=lmm(f, t, 1, h1, alpha, beta, 'ExactSolution', x);
+rest=lmm(f, t, 1, h1, alpha, beta, 'ExactSolution', x, 'ReportGE', true);
 ABE_1 = rest.GE(end);
-rest=lmm(f, t, [1,tri(h1)], h1, alpha, beta, 'ExactSolution', x);
+rest=lmm(f, t, [1,tri(h1)], h1, alpha, beta, 'ExactSolution', x, 'ReportGE', true);
 ABT_1 = rest.GE(end);
-rest = tsp(F, t, 1, h1, 'ExactSolution', x);
+rest = tsp(F, t, 1, h1, 'ExactSolution', x, 'ReportGE', true);
 TS1 = rest.GE(end);
 
 table([.2;.1], round(1e3*[TS2;TS1],1), round(1e3*[ABE_2;ABE_1],1), round(1e3*[ABT_2;ABT_1],1), 'VariableNames', {'h', 'TS(2)', 'ABE', 'ABT'})
@@ -70,7 +70,7 @@ beta = [251/720, -1274/720, 2616/720, -2774/720, 1901/720]';
 %     "PlotResult", true, "PauseDuration", .02)
 
 rest=lmm(f, t, x0, h, 'Method', 'AB(5)', "ExactSolution", x, ...
-    "PlotResult", true, "PauseDuration", .02)
+    "PlotResult", true, "PauseDuration", .02, 'ReportGE', true)
 
 %%
 clear;

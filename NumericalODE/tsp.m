@@ -205,18 +205,19 @@ function [rest, xp_seq]=tsp(F, t, x0, h, tol, options)
 % - Enh: implement "options.ReportLTEestimate using a higher-order method
 
 %% Function Arguments
+
 arguments
     F   (1,1) function_handle {mustBeAFunctionOfNArguments(F, 2, '@(x,t)'), mustBeOfPrescribedSignature(F, '@(x,t)')} % a matrix containing gradient functions [f1, f2, ..., fp] where fi is the i'th derivative of x
-    t   (2,1) double {mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
-    x0  (:,1) double {mustBeReal, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, F, {'x0', 'F'})} % vector of initial conditions
-    h         double {mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % time-step
-    tol       double {mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % tolerance
+    t   (2,1) double {mustBeFinite, mustBeReal, mustBeNonempty, mustHaveNonNegativeLength(t)} % timespan, specified as [t0, tf]
+    x0  (:,1) double {mustBeFinite, mustBeNonempty, mustBeOfCompatibleSizeWithFcn(x0, F, {'x0', 'F'})} % vector of initial conditions
+    h         double {mustBeFinite, mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % time-step
+    tol       double {mustBeFinite, mustBeReal, mustBePositive, mustBeScalarOrEmpty} = [] % tolerance
 
     options.ExactSolution           (:,1) function_handle ...
         {mustBeAFunctionOfNArguments(options.ExactSolution, 1, '@(t)'), ...
         mustBeOfPrescribedSignature(options.ExactSolution, '@(t)'), ... % exact analytical solution @(t)
         mustBeOfCompatibleSizeWithFcn(x0, options.ExactSolution, {'x0', 'options.ExactSolution'})}
-    options.PauseDuration           (1,1) {mustBeReal, mustBeNonempty, mustBeNonnegative} = .5;
+    options.PauseDuration           (1,1) {mustBeFinite, mustBeReal, mustBeNonempty, mustBeNonnegative} = .5;
     options.PlotResult              (1,1) logical = false;
     options.PlotInterpolatingCurve  (1,1) logical = false;
     options.ReportGE                (1,1) logical = false;
@@ -287,6 +288,7 @@ elseif options.ReportLTE && ~is_exact_available
 end
 
 %% Obtaining Approximate Solutions
+
 if ~is_adaptive_step_size_mode
 
     % uniformly discretize the time domain
