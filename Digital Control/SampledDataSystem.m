@@ -19,10 +19,11 @@ yc = step(cl, tc);
 fig = figure('Units', 'Normalized');
 fig.Position = [0.1583 0.1925 0.7297 0.7002];
 tl = tiledlayout(2,2,"TileSpacing","compact","Padding","compact");
-nexttile;
+nexttile(2);
 plot(tc, yc, 'DisplayName', ['Plant output in analog setting (driven by the analog controller)', newline, ...
-    'only shown as a baseline']);
+    'not real and only shown as a baseline']);
 hold on;
+title('Outputs');
 
 % In a computer-controlled system, we treat every signal in the closed-loop
 % system as discrete-time signal. By placing the plant inside the control
@@ -328,18 +329,19 @@ M = [0 P;1 0;0 P]; % extended plant to match sdlsim structure: A 2-input, 3-outp
 % actual plant output is unobservable in real life. It is only inspectable
 % in simulation settings.
 plot(vt{1},vt{2}, 'LineWidth', 1.1, 'DisplayName', '\bf $y(t)$: Actual plant output in the digital control system');
-xlabel('time');
-ylabel('amplitude');
+xlabel('Time');
+ylabel('Amplitude');
 grid on;
 legend('Location','southeast', 'Interpreter', 'latex');
 
-nexttile;
+nexttile(1);
 plot(td, ud, 'r*', 'DisplayName', '$u[n]$: Output of the digital controller');
 hold on;
+title('Inputs');
 plot(ut{1},ut{2}, 'b-', 'LineWidth', 1, 'DisplayName', ['\bf $u(t)$: Output of the digital controller after ZOH:', newline, ...
     '\bf right before injecting to the plant']);
-xlabel('time');
-ylabel('amplitude');
+xlabel('Time');
+ylabel('Amplitude');
 grid on;
 legend('Interpreter','latex');
 
@@ -364,5 +366,5 @@ ax = gca;
 set(ax, 'XTick', [], 'XTickLabel', [], 'YTick', [], 'YTickLabel', []);
 
 title(tl, ...
-    ['bold signals are cont. and are not observable by digital computer in their cont. form', ...
+    ['Bold signals are cont. and are not observable by digital computer in their cont. form', ...
     newline, sprintf('Ts = %.3f', Ts)]);
