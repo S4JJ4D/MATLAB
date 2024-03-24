@@ -58,11 +58,18 @@ u_theta_ctrl = tf(-[11.78 63.01 65.4], [1 0]);
 % extracting U(s) --> X(s) transfer function 
 u_x_tf = sys_tf(1);
 
+% ------- Classical Control Design
+u_x_ss = ss(u_x_tf);
+K1 = place(u_x_ss.A, u_x_ss.B, [-1 -2 -3 -4]);
+L1 = place(u_x_ss.A.', u_x_ss.C.', [-1 -2 -3 -4]-10).';
+Ctf = tf(ss(u_x_ss.A-L1*u_x_ss.C-u_x_ss.B*K1, L1, K1, 0));
+
 %% Iterative Plot
 
 load data;
 
 % choose from S1, S2, ..., S6
+% Or run 'pendulum_control.slx'
 time = S6.time;
 state_vec = S6.state_vec;
 
