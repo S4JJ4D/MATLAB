@@ -1,0 +1,35 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+\margl1440\margr1440\vieww17040\viewh12100\viewkind0
+\deftab720
+\pard\pardeftab720\sl400\partightenfactor0
+
+\f0\b\fs34 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Explanation
+\b0 \
+\pard\pardeftab720\sl400\sa346\partightenfactor0
+\cf2 Preallocation is a valuable tool for code that requires frequent memory reallocation. However, it is best to avoid using preallocated memory for a variable that you assign to output from another function. \
+Assume a function, 
+\f1 fetchData
+\f0 , returns a 100\'96element row vector, and the output is assigned to a variable with preallocated memory. The code might look like this: \
+\pard\pardeftab720\sl400\partightenfactor0
+
+\f1 \cf2 myData\'a0=\'a0zeros(1,100);\'a0%\'a0preallocated\'a0vector\'a0populated\'a0with\'a0zeros\
+myData\'a0=\'a0fetchData();
+\f0 \
+\pard\pardeftab720\sl400\sa346\partightenfactor0
+\cf2 The 
+\f1 fetchData
+\f0  function allocates memory for its output data. Therefore, a successful call to the 
+\f1 fetchData
+\f0  function returns a replacement for the preallocated memory. Here, the memory is allocated twice and preallocation has no benefit. \
+\pard\pardeftab720\sl400\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sl400\partightenfactor0
+
+\b \cf2 Suggested Action
+\b0 \
+\pard\pardeftab720\sl400\sa346\partightenfactor0
+\cf2 Avoid preallocating memory to a variable assigned to the output of another function. \
+}

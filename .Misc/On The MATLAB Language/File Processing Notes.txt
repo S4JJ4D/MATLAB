@@ -1,0 +1,5 @@
+- mfilename('fullpath') full path of currently running code
+- filesep
+- savepath
+- which (get the path to the specified file)
+- fileparts

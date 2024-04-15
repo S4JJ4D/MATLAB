@@ -1,0 +1,105 @@
+19. get properties of an obj:
+	prop = properties(foo)
+
+20. get methods of an obj:
+	meth = methods(foo)
+
+
+21. create an array of empty structures:
+	repmat(struct(),1,n)
+    
+- similarly, you can create an array of specific sturcts as
+	repmat(struct('a', [], 'b', [], ...),1,n)
+
+- Also, we can use:
+	n = 10;
+	M(n) = struct('a', [], 'b', [], ...);
+	or
+	M(n) = struct();
+
+
+
+22. Create an array of empty objects:
+	search help for "empty"
+
+23. Create an empty array of graphics objects to be filled later
+	b = gobjects(1,4);
+
+
+24. Set axes aspect ratio to "equal" and prevent axes from resizing:
+	you need to execute the following commands:
+	1. axis({axesHandle}, {DesiredLimit});
+	2. {axesHandle}.DataAspectRatio = [1 1 1];
+
+
+25. How to prevent a plot to be added to the currently created legend object when plotting?
+	$ plot(..., 'HandleVisibility', 'off');
+	this prevents legend object to see the handle of this plot.
+
+26. MATLAB latex bold math:
+	text('position',[0.5 0.5],'Interpreter','latex','String','$\sqrt{ a \cdot \mbox{\boldmath $b$} }$')
+
+27. To view ALL properties (including hidden/undocumented properties) of an object:
+	$ struct(<hdlName>)
+
+[to Inspect an object handle (Java/COM/HG); display its methods/properties/callbacks use UIINSPECT by Yair Altman: https://www.mathworks.com/matlabcentral/fileexchange/17935-uiinspect-display-methods-properties-callbacks-of-an-object?s_tid=prof_contriblnk]
+
+28. To see whether a class is inheriting from a "handle" class, use the following command. In the output of this command, a line of comment is inserted
+to indicate whether its a subclass of "handle" or not.
+	$ methods(<ObjName>)
+
+29. To view ALL methods of an object/class:
+	a) first, see the associated class: $ class(<ObjName>)
+	b) run: $ help <ClassNameInTheOutputOfThePrevCommand>
+	c) it will print a hyperlink to the class docs.
+
+	Alternatively, use the rich toolset in "Class Introspection and Metadata" section in the help.
+
+30. Copy the axes object to the clipboard:
+	$ copygraphics(ax);
+
+31. Export axes as image/vector obejcts:
+	$ exportgraphics(...);
+
+32. Create empty plot:
+	$ plot(nan, nan);
+	or
+	$ plot(nan);
+
+33. Specify Alpha for graphical objects that don't have an 'FaceAlpha' property: You can try adding a fourth element
+to the 'Color' property. For example:
+	1. to specify alpha for the line object created by plot function, use:
+	$ p = plot([0,1], [0,1], 'Color', [1, 0, 0, .3]);
+	2. to specify alpha for the rectangle object created by rectangle function, use:
+	$ r = rectangle('Position',pos,'Curvature',[1 1], 'FaceColor', [1, 0, 0, .3]);
+
+
+34. How to enable minimal updating of legend object during animating plots:
+	The key is to place the legend objects onto another invisible axes.
+	This way, when you update the plot objects, the corresponding legend objects
+	which exist on another axes object go through minimal update procedure:
+
+	$ hAxes2 = axes(gcf); 	  % create a new axes
+	$ hold on;
+	$ L1 = plot(nan, nan, 'Color', 'b'); % create fake empty plots to attach legends to them
+	$ L2 = plot(nan, nan, 'Color', 'r', 'LineWidth', 1.5); % create fake empty plots to attach legends to them
+	$ lgd = legend(hAxes2, [L1, L2], {'True CDF', 'Emperical CDF'}, ...
+	    'Location', 'northwest', 'Box', 'on', 'AutoUpdate', 'off');
+	$ set(hAxes2, 'Visible', 'off'); % hide the axes
+	$ set(gcf,'defaultLegendAutoUpdate','off');
+
+
+------------- MATHEMATICA STYLE PLOTTING ---------------
+% Mathematica Style:
+% 'FontName', 'Source Code Pro'
+% Area Colors: 'FaceColor', '#DAD9EB', 'FaceColor', '#F6E1BE'
+% Edge Colors: 'EdgeColor', '#4A457F', 'EdgeColor', '#E5A73C'
+% Axes Style:
+% set(ax, 'XMinorTick', 'on', 'YMinorTick', 'on', ...
+%     'XAxisLocation', 'origin', 'YAxisLocation', 'origin', ...
+%     'Box', 'on', ...
+%     'FontName', 'Source Code Pro');
+--------------------------------------------------------
+
+
+35. [C{:}] is a faster inlined version of cell2mat (Test it using the command "tic; cell2mat(C); toc; tic; [C{:}]; toc;")

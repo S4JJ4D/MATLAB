@@ -1,0 +1,4 @@
+for a good practice, refer to:
+C:\Users\Sajjad\Documents\MATLAB\Modern Control Project\Nonlinear_Simulink_Model.slx
+
+to dashboard.

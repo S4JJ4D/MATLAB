@@ -54,7 +54,7 @@ time = 0:Tc:t_max;
 N = numel(time);
 
 
-% response of the underdamped system:
+% full time response of the underdamped system to the impulse input:
 h = 1/(k) * w_n/sqrt(1-zeta^2) * exp(-sigma*time).*sin(w_d.*time);
 % % uncomment to verify the validity of the impulse response
 % figure;
@@ -64,9 +64,9 @@ h = 1/(k) * w_n/sqrt(1-zeta^2) * exp(-sigma*time).*sin(w_d.*time);
 
 % output variance (average power) is the white nosie power-level scaled by
 % int(h^2,-inf,inf)
-hh = h.^2;
 % it turned out that the value of the integral int(h^2,-inf,inf), for the underdamped
 % system is 1/(2*k*b):
+hh = h.^2;
 assert(round(trapz(time,hh), 4) == 1/(2*k*b))
 % t_val = 1/k; % threshold val
 % fprintf('σ = %.3f %c %.3f\n', sigma, ...

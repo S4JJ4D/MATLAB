@@ -1,0 +1,346 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2511
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Arial-BoldMT;\f2\fswiss\fcharset0 Helvetica-Oblique;
+\f3\fswiss\fcharset0 Helvetica;\f4\fmodern\fcharset0 Courier;\f5\froman\fcharset0 Times-Roman;
+\f6\fswiss\fcharset0 Arial-BoldItalicMT;\f7\fswiss\fcharset0 Arial-ItalicMT;\f8\fmodern\fcharset0 Courier-Bold;
+\f9\fnil\fcharset0 Menlo-Bold;\f10\fnil\fcharset0 Menlo-Regular;\f11\fnil\fcharset0 CourierPrimal-Bold;
+\f12\fnil\fcharset0 CourierPrimal-Regular;}
+{\colortbl;\red255\green255\blue255;\red87\green87\blue87;\red181\green64\blue4;\red49\green49\blue49;
+\red87\green87\blue87;\red255\green255\blue255;\red0\green0\blue0;\red160\green32\blue240;\red251\green2\blue7;
+\red251\green2\blue7;\red255\green255\blue84;\red157\green255\blue255;\red127\green127\blue127;\red153\green102\blue51;
+\red49\green49\blue49;}
+{\*\expandedcolortbl;;\csgenericrgb\c34118\c34118\c34118;\csgenericrgb\c70980\c25098\c1569;\csgenericrgb\c19216\c19216\c19216;
+\cssrgb\c41569\c41569\c41569;\cssrgb\c100000\c100000\c100000;\cssrgb\c0\c0\c0;\csgenericrgb\c62745\c12549\c94118;\cssrgb\c100000\c14913\c0;
+\cssrgb\c100000\c14913\c0;\csgenericrgb\c100000\c100000\c32941;\csgenericrgb\c61569\c100000\c100000;\csgenericrgb\c49804\c49804\c49804;\cssrgb\c66800\c47512\c25860;
+\cssrgb\c25098\c25098\c25098;}
+\margl1440\margr1440\vieww21500\viewh15320\viewkind0
+\deftab720
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f0\fs26 \cf2 \expnd0\expndtw0\kerning0
+ 
+\f1\b\fs54 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \
+\pard\pardeftab720\sl480\sa320\qc\partightenfactor0
+
+\fs90 \cf2 MATLAB SECTION\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs54 \cf2 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+\f0\b0\fs44 \cf3 \
+*****Flatten[] (in mathematica) , squeeze() (in MATLAB)*****\
+1. uiwait: 
+\fs26 \cf2 Block program execution and wait to resume\cf4 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 2. msgbox: 
+\fs26 \cf2 Create message dialog box\
+
+\fs44 \cf3 3. uiresume: 
+\fs26 \cf2 Resume execution of blocked program\
+
+\fs44 \cf3 4. gcbf: 
+\fs26 \cf2 Handle of figure containing object whose callback is executing\
+
+\fs44 \cf3 4.1. gcbf: 
+\fs26 \cf5 \cb6 Get handle of current block\cf2 \cb1 \
+
+\fs44 \cf3 5. uistack: 
+\fs26 \cf2 Reorder visual stacking order of objects\
+
+\fs44 \cf3 6. gcf: 
+\fs26 \cf2 Current figure handle\
+
+\fs44 \cf3 6***. gcs: 
+\fs26 \cf2 Get pathname of current system\
+
+\fs44 \cf3 7. drawnow: 
+\fs26 \cf2 Update figures and process callbacks\
+
+\fs44 \cf3 8. uigetfile: 
+\fs26 \cf2 Open file selection dialog box\
+
+\fs44 \cf3 9. movegui: 
+\fs26 \cf2 Move UI figure to specified location on screen\cf4 \
+
+\fs44 \cf3 10. guidata: 
+\fs26 \cf2 Store or retrieve UI data\
+
+\fs44 \cf3 11. findobj: 
+\fs26 \cf2 Locate graphics objects with specific properties\cf4 \
+
+\fs44 \cf3 12. run: 
+\fs26 \cf2 Run MATLAB script\
+
+\fs44 \cf3 13. uimenu: 
+\fs26 \cf2 Create menus and menu items on figure windows\
+
+\fs44 \cf3 -to make new line in latex format use this: \{\'91 \'91, \'91yourtext\'92\}\
+14. ginput: 
+\fs26 \cf2 Graphical input from mouse or cursor\
+\pard\pardeftab720\partightenfactor0
+
+\fs44 \cf3 15. Vectorize Function: \
+example: \
+>> f = @(x,y) \'85.\
+>> f = eval(vectorize(f));\
+\
+16. ismember()\
+\
+17. printing in command window in bold!! : \
+	\cf7 fprintf('Hello <strong> bold </strong> world.\\n')\
+\
+\cf3 18. creating timeseries object and subseqeunt \'85.: \
+\pard\pardeftab720\partightenfactor0
+
+\f2\i\fs30 \cf0 \kerning1\expnd0\expndtw0 Q = timeseries(yVec1,tVec,\cf8 'Name'\cf0 ,\cf8 'x_quiantizedVal'\cf0 ); \
+convertedDataset = Simulink.SimulationData.Dataset(Q);
+\f3\i0\fs24 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs44 \cf3 \expnd0\expndtw0\kerning0
+ \cf7 \
+\cf3 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs26 \cf2 \
+\
+ 
+\f1\b\fs54 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \
+\pard\pardeftab720\sl480\sa320\qc\partightenfactor0
+
+\fs90 \cf2 SIMULINK SECTION\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs54 \cf2 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+\f0\b0\fs26 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 15. Simulink.ModelWorkspace: 
+\fs26 \cf2 Describe model workspace\
+
+\fs44 \cf3 16. fileparts: 
+\fs26 \cf2 Parts of file name and path\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f1\b\fs40 \cf2 16.1.  objects = find_system(bdroot,'SearchDepth\'92,1): 
+\f0\b0 get all blocks in a simulink file\
+
+\f1\b Also: objects_handles = Simulink.findBlocks(bdroot,\'92Name\'92,\'92ConstDisp\'92):\
+
+\f0\b0 \cf9 %%% having a number for the block handle, how to locate the block in simulink editor?\
+%%% answer: use the following:
+\f1\b \cf2 \
+(I). handlebl = Simulink.findBlocks(gcs) % lists all the blocks in the model\
+(II). names = getfullname(handlebl) % lists the names of all the blocks in the model\
+(III). idx = find(int16(handlebl) == number_of_your_block_handle) % locates the index \
+(IV). names(idx) % block found!\
+
+\f0\b0 \
+
+\f1\b 16.2. gcs: 
+\f0\b0 get pathname of current system\
+
+\f1\b 16.2. getfullname: 
+\f0\b0 get full path of a simulink block (getfullname(gcbh))\
+
+\f1\b \cf10 inside Block Mask:
+\f0\b0 \cf2 \
+
+\f1\b 16.3 New Line in "tex" mode: \
+\pard\pardeftab720\partightenfactor0
+
+\f2\i\b0\fs30 \cf0 \kerning1\expnd0\expndtw0 disp([\cf8 '\{\\bf\\fontsize\{15\}u\}'\cf0 , \cf8 '\\newline(input)'\cf0 ], \cf8 'texmode'\cf0 , \cf8 'on'\cf0 )
+\f3\i0\fs28 \cf7 \cb6 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+\cf7 To get a new line with TeX formatting, \ul use \'93\\newline\'94 \ulnone in the TEXT function.\
+
+\fs32 an interesting feature in writing command for mask display
+\fs36 :
+\fs32  
+\f4 fprintf(\'91blah blah\'92); displays blah blah. fprintf(\'91blah blah \\n\\n\'92): moves blah blah up.\
+fprintf(\'91\\n \\n blah blah\'92): moves blah blah down.\
+\pard\pardeftab720\sl359\partightenfactor0
+
+\f0\fs26 \cf4 \cb1 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 \cb11 Model\cb1  \cb12 Callbacks\cb1 \
+17. bdroot: 
+\fs26 \cf2 Return name of top-level Simulink system\cf4 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 18. getSimulinkBlockHandle: 
+\fs26 \cf2 Get block handle from block path\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 \cb11 Block\cb1  \cb12 Callbacks
+\fs26 \cf4 \cb1 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 19. winopen: 
+\fs26 \cf2 Open file in appropriate application (Windows)\cf4 \
+
+\fs44 \cf3 20. gcbh: 
+\fs26 \cf2 Get handle of current block\
+
+\fs44 \cf3 30. Simulink.MDLInfo class\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+\cf3 \cb11 Model\cb1  \cb12 Parameters\cb1 \
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f5\fs24 \cf0 \
+\pard\pardeftab720\sl359\partightenfactor0
+
+\f6\i\b\fs52 \cf4 *Access to simulink model block parameters:\
+\
+\pard\tx674\pardeftab674\pardirnatural\partightenfactor0
+
+\fs48 \cf13 \kerning1\expnd0\expndtw0 \CocoaLigature0 Step 1: Get handle of the desired block using:\
+		hdl = getSimulinkBlockHandle([path to that block]);\
+Step 2: get_param(hdl,\'92ObjectParameters\'92);
+\fs52 \cf4 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f5\i0\b0\fs24 \cf0 \
+\
+\pard\pardeftab720\sl359\partightenfactor0
+
+\f6\i\b\fs52 \cf4 *Access to model workspace variables:\
+\
+\pard\tx674\pardeftab674\pardirnatural\partightenfactor0
+
+\fs48 \cf13 \kerning1\expnd0\expndtw0 \CocoaLigature0 h = get_param(bdroot,\'92modelworkspace');\
+Jg = getVariable(h,\'92Jg');
+\f7\b0 \cf0 \
+\pard\tx674\pardeftab674\pardirnatural\partightenfactor0
+
+\f6\b \cf0 \
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f5\i0\b0\fs28 \cf0 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+\pard\pardeftab720\sl359\partightenfactor0
+
+\f6\i\b\fs52 \cf4 *Access to "model properties":\
+\
+\pard\pardeftab720\sl359\partightenfactor0
+
+\fs48 \cf4 1. get_param(bdroot,\'92ObjectParameters\'92)\
+
+\f7\b0 after inspecting model parameters u can modify them through:\
+
+\f6\b 2. get_param(bdroot,\'92\'85\'92) or set_param(bdroot,\'92\'85\'92)\
+\
+\pard\pardeftab720\sl359\partightenfactor0
+\cf13 Example: get model full path:\
+\pard\pardeftab720\sl359\partightenfactor0
+\cf4 get_param(bdroot,'FileName')
+\f0\i0\b0\fs26 \cf2 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs44 \cf3 \
+\pard\pardeftab720\sl359\partightenfactor0
+
+\f6\i\b\fs48 \cf13 Example: get model simulation Time:\
+\pard\pardeftab720\sl359\partightenfactor0
+\cf4 get_param(bdroot,\'92StopTime\'92)\
+\
+\
+\pard\pardeftab720\sl359\partightenfactor0
+
+\fs52 \cf4 *Access to model workspace variables in simulink matlab Function:\
+\
+\pard\pardeftab720\sl359\partightenfactor0
+\cf13 1. add desired variables as matlab function input (exp: function a = name(c,d) %c and d are modelsorkspace variabels)\
+2. go to modelWorkspace \'97\'97> matlab function \'97\'97> change c and d types to "parameters"
+\fs48 \cf4 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f0\i0\b0\fs44 \cf3 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f1\b \cf3 Edit Text objects in Mask:\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f3\b0\fs32 \cf7 \cb6 first get the "mask object" from the existing mask block: ( "h" is the handle to the mask block. use above techniques to get the handle. you can replace h with gcbh if you have already selected the block in your simulink model).
+\f1\b\fs44 \cf3 \cb1 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f8\fs36 \cf14 p = get_param(h,\'92MaskObject')	\
+Alternatively, you can use:\
+\pard\pardeftab720\sl360\partightenfactor0
+
+\f9 \cf14 \cb6 p = Simulink.Mask.get(gcbh)
+\f10\b0\fs26 \cf15 \
+
+\f1\b\fs44 \cf3 \cb1 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f3\b0\fs32 \cf7 \cb6 now we have the mask object, named p. the "text" in your mask has a "name". you need to used that name to access it\'92s parameters and edit them. let\'92s say the name is \'91eig_text\'92\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f8\b\fs36 \cf14 [control, phandle] = p.getDialogControl('eig_text')\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f3\b0\fs32 \cf7 \cb1 now you can use control output to edit the properties of the text. gg.
+\fs44 \cf3 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f0 \cf3 Use MATLAB Commands to Change Workspace Data\
+\pard\pardeftab720\partightenfactor0
+
+\f4 \cf7 hws = get_param(bdroot, 'modelworkspace');\
+hws.DataSource = 'MAT-File';\
+hws.FileName = 'params';\
+hws.assignin('pitch', -10);\
+hws.assignin('roll', 30);\
+hws.assignin('yaw', -2);\
+hws.saveToSource;\
+hws.assignin('roll', 35);\
+hws.reload;\
+\
+
+\f8\b\fs54 \cf10 Programmatic Model Editing\
+\
+Update Model Programatically:\
+
+\f4\b0\fs44 \cf7 model([],[],[],\'92sizes\'92); (see docs for \'91model\'92)
+\f8\b\fs54 \cf10 \
+
+\f4\b0\fs44 \cf7 \
+\
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f0 \cf3 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs26 \cf2  
+\f1\b\fs54 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \
+\pard\pardeftab720\sl480\sa320\qc\partightenfactor0
+
+\fs90 \cf2 miscellaneous \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\fs54 \cf2 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+\f0\b0\fs44 \cf3 \
+\pard\pardeftab720\sl480\sa320\partightenfactor0
+
+\f11\b \cf3 1.
+\f12\b0  an interesting idea to sum all elements in a vector:\
+given x = [x1,x2, \'85. ,xn]; \
+compute [1,1,1,\'85,1]*transpose(x);\
+
+\f11\b 2.
+\f12\b0  "Matrix subscrpting"\
+
+\f11\b 3.
+\f12\b0  set(x,\'92property\'92,y); is sometimes better than x.proeprty = y\
+
+\f11\b 4.
+\f12\b0  x = [1:3]\'92 ; then:\
+	x(:,ones(1,n)) =  repmat(x,1,n);\
+
+\f11\b 5. 
+\f12\b0 clear myFunctionName; %clear all persistent vars in this function}

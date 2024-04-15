@@ -19,7 +19,7 @@ axis([ -4.7956    4.8454   -4.9919    5.6491]);
 ax.DataAspectRatio = [1 1 1];
 
 sp1 = DynamicSpring('spring1', 'Radius', .25, 'Pitch', .03, 'Turns', 18, 'Axes', ax, 'VisualForm', 'detailed');
-sp2 = DynamicSpring('spring2', 'Radius', .25, 'Pitch', .03, 'Turns', 13, 'Axes', ax, 'VisualForm', 'axled');
+sp2 = DynamicSpring('spring2', 'Radius', .25, 'Pitch', .03, 'Turns', 13, 'Axes', ax, 'VisualForm', 'detailed');
 sp2.plotting_options.FrontEyeOuterColor = 'b';
 sp2.plotting_options.RearEyeOuterColor = 'r';
 
@@ -49,8 +49,8 @@ freq = 1/median(diff(time));
 
 n = 1;
 
-sp1.PlotSpring(vecnorm([x1(n), y1(n)]), 'Configuration', [0, 0, atan2(y1(n), x1(n))]);
-sp2.PlotSpring(vecnorm([x2(n), y2(n)]), 'Configuration', [x1(n), y1(n), atan2(y2(n), x2(n))]);
+sp1.Plot([0, 0], atan2(y1(n), x1(n)),vecnorm([x1(n), y1(n)]));
+sp2.Plot([x1(n), y1(n)], atan2(y2(n), x2(n)),vecnorm([x2(n), y2(n)]));
 
 hg_ball1.Matrix = makehgtform('translate', [x1(n), y1(n), 0]);
 hg_ball2.Matrix = makehgtform('translate', [x1(n)+x2(n), y1(n)+y2(n), 0]);
@@ -68,8 +68,8 @@ tic;    %start time measuring
 % I added the "ishandle" so the program will end in case u closed the figure
 while (n <= numel(time))
 
-    sp1.PlotSpring(vecnorm([x1(n), y1(n)]), 'Configuration', [0, 0, atan2(y1(n), x1(n))]);
-    sp2.PlotSpring(vecnorm([x2(n), y2(n)]), 'Configuration', [x1(n), y1(n), atan2(y2(n), x2(n))]);
+    sp1.Plot([0, 0], atan2(y1(n), x1(n)),vecnorm([x1(n), y1(n)]));
+    sp2.Plot([x1(n), y1(n)], atan2(y2(n), x2(n)),vecnorm([x2(n), y2(n)]));
 
     hg_ball1.Matrix = makehgtform('translate', [x1(n), y1(n), 0]);
     hg_ball2.Matrix = makehgtform('translate', [x1(n)+x2(n), y1(n)+y2(n), 0]);

@@ -51,7 +51,7 @@ classdef DynamicSpring < handle
     %
     %     - Plot the spring when it is anchored at [1, 2], oriented at 30 degrees
     %       w.r.t the horizontal line and is stretched to a given length of 5:
-    %       sp1.PlotSpring(5, 'Configuration', [1, 2, pi/6]);
+    %       sp1.Plot(5, 'Configuration', [1, 2, pi/6]);
     %
     %     - Plot the spring with "axled" visual form:
     %       sp1.visual_form = "axled";
@@ -131,6 +131,82 @@ classdef DynamicSpring < handle
 
         % ---------------------------------------------------------------------------
         %% Plotting
+        function Plot(obj, varargin)
+            %Plot   Plots the spring
+            %   Plot(obj): uses the internally stored (config, length)
+            %   Plot(obj, length): uses the internally stored config along with the given length
+            %   Plot(obj, config): uses the internally stored length along with the given config=(anchor, angle)
+            %   Plot(obj, anchor1, anchor2)
+            %   Plot(obj, anchor, angle, length)
+            
+            narginchk(1,4);
+            ni = nargin;
+            % validate the 1st input
+            validateattributes(obj, {'DynamicSpring'}, {}, mfilename, 'obj', 1);
+            
+            if ni == 1
+                % f(obj) is called
+                obj.PlotSpring(obj, obj.total_length)
+            
+            elseif ni == 2
+                in2 = varargin{1};
+                validateattributes(in2, {'numeric'}, {'real', 'finite'});
+                if isscalar(in2) && ~isempty(in2) && in2 >=0
+                    % The first variation is called: f(obj, length)
+                    springLength = in2;
+                    obj.PlotSpring(obj, springLength)
+            
+                elseif isvector(in2) && numel(in2) == 3
+                    % The first variation is called: f(obj, config)
+                    config = in2;
+                    obj.PlotSpring(obj, ...
+                        obj.total_length, ...
+                        'Configuration', config);
+                end
+            
+            elseif ni == 3
+                % f(obj, anchor1, anchor2) is called
+                anchor1 = varargin{1};
+                anchor2 = varargin{2};
+                validateattributes(anchor1, ...
+                    {'numeric'}, ...
+                    {'real', 'finite', 'vector', 'numel', 2});
+
+                validateattributes(anchor2, ...
+                    {'numeric'}, ...
+                    {'real', 'finite', 'vector', 'numel', 2});
+                
+                d_vec = anchor2 - anchor1; % a vector extending from anchor1 towards anchor2
+                springLength = vecnorm(d_vec);
+                obj.PlotSpring(springLength, ...
+                    'Configuration', [anchor1, atan2(d_vec(2), d_vec(1))]);
+            
+            else
+                % f(obj, anchor, angle, length) is called
+                anchor = varargin{1};
+                angle = varargin{2};
+                springLength = varargin{3};
+                validateattributes(anchor, ...
+                    {'numeric'}, ...
+                    {'real', 'finite', 'vector', 'numel', 2});
+            
+                validateattributes(angle, ...
+                    {'numeric'}, ...
+                    {'real', 'finite', 'scalar', 'nonempty'});
+            
+                validateattributes(springLength, ...
+                    {'numeric'}, ...
+                    {'real', 'finite', 'scalar', 'nonempty', 'nonnegative'});
+
+                obj.PlotSpring(springLength, ...
+                    'Configuration', [anchor, angle]);
+            end
+        end
+
+    end
+
+    methods (Access=private)
+
         function PlotSpring(obj, total_length, options)
             arguments
                 obj
@@ -414,20 +490,23 @@ classdef DynamicSpring < handle
             radius_eye_vec = [r_eye_in, r_eye_out];
             line_width = obj.plotting_options.LineWidth;
 
+            tmp_fig = figure('Visible', 'off');
+            tmp_ax  = axes(tmp_fig);
+            hold(tmp_ax, 'on');
+
             if obj.visual_form == "simplified"
                 t = 0:0.01:obj.theta;
-                springPlotGp = plot(obj.ax, obj.pitch*t, -obj.radius*sin(t), ...
+                springPlotGp = plot(tmp_ax, obj.pitch*t, -obj.radius*sin(t), ...
                     'Tag', 'hg_graphical_spring', 'LineWidth', line_width, 'Color', obj.plotting_options.SpringBodyColor);
 
             elseif obj.visual_form == "detailed"
 
                 % ------------------------ Group all plots together
-                springPlotGp = hggroup();
-                springPlotGp.Tag = 'hg_graphical_spring';
+                springPlotGp = hggroup('Tag', 'hg_graphical_spring');
 
 
                 % ------------------------ Case Mounting Joint
-                case_patch(1) = PlotAnnulusPatch(obj.ax, [0, 0], radius_eye_vec,...
+                case_patch(1) = PlotAnnulusPatch(tmp_ax, [0, 0], radius_eye_vec,...
                     'FaceColor', obj.plotting_options.RearEyeOuterColor,...
                     'FaceAlpha', obj.plotting_options.RearEyeOuterColorAlpha,...
                     'InnerCircleFaceColor', obj.plotting_options.RearEyeInnerColor,...
@@ -442,7 +521,7 @@ classdef DynamicSpring < handle
                 b = .3*a;
                 x = [-b*sin(t), 1.2*r_eye_out, 1.2*r_eye_out, 0] + r_eye_out;
                 y = [a*cos(t), -a, a, a];
-                case_patch(2) = patch(obj.ax, 'XData', x, 'YData', y,...
+                case_patch(2) = patch(tmp_ax, 'XData', x, 'YData', y,...
                     'FaceColor', obj.plotting_options.RearClevisColor,...
                     'LineWidth', line_width, ...
                     'Tag', 'Case Mounting Clevis 1');
@@ -452,14 +531,14 @@ classdef DynamicSpring < handle
                 t_i = r_eye_out/obj.pitch;
                 t_f = (x_end - r_eye_out)/obj.pitch;
                 t = t_i:0.05:t_f;
-                spring_plt = plot(obj.ax, obj.pitch*t, -obj.radius*sin(t), ...
+                spring_plt = plot(tmp_ax, obj.pitch*t, -obj.radius*sin(t), ...
                     'LineWidth', line_width, 'Color', obj.plotting_options.SpringBodyColor, ...
                     'Tag', 'Spring');
-                obj.ax.Children = circshift(obj.ax.Children, -1);
+                tmp_ax.Children = circshift(tmp_ax.Children, -1);
 
 
                 % ------------------------ Case Mounting Joint 2
-                case_patch(3) = PlotAnnulusPatch(obj.ax, [x_end, 0], radius_eye_vec,...
+                case_patch(3) = PlotAnnulusPatch(tmp_ax, [x_end, 0], radius_eye_vec,...
                     'FaceColor', obj.plotting_options.FrontEyeOuterColor,...
                     'FaceAlpha', obj.plotting_options.FrontEyeOuterColorAlpha,...
                     'InnerCircleFaceColor', obj.plotting_options.FrontEyeInnerColor,...
@@ -474,24 +553,23 @@ classdef DynamicSpring < handle
                 b = .3*a;
                 x = -[-b*sin(t), 1.2*r_eye_out, 1.2*r_eye_out, 0] + x_end - r_eye_out;
                 y = [a*cos(t), -a, a, a];
-                case_patch(4) = patch(obj.ax, 'XData', x, 'YData', y,...
+                case_patch(4) = patch(tmp_ax, 'XData', x, 'YData', y,...
                     'FaceColor', obj.plotting_options.FrontClevisColor,...
                     'LineWidth', line_width, ...
                     'Tag', 'Case Mounting Clevis 2');
 
 
                 set([case_patch, spring_plt], 'Parent', springPlotGp);
-                obj.ax.Children(1).Children = circshift(obj.ax.Children(1).Children, -1);
+                tmp_ax.Children(1).Children = circshift(tmp_ax.Children(1).Children, -1);
 
             else
 
                 % ------------------------ Group all plots together
-                springPlotGp = hggroup();
-                springPlotGp.Tag = 'hg_graphical_spring';
+                springPlotGp = hggroup(tmp_ax, 'Tag', 'hg_graphical_spring');
 
 
                 % ------------------------ Case Mounting Joint
-                case_patch(1) = PlotAnnulusPatch(obj.ax, [0, 0], radius_eye_vec,...
+                case_patch(1) = PlotAnnulusPatch(tmp_ax, [0, 0], radius_eye_vec,...
                     'FaceColor', obj.plotting_options.RearEyeOuterColor,...
                     'FaceAlpha', obj.plotting_options.RearEyeOuterColorAlpha,...
                     'InnerCircleFaceColor', obj.plotting_options.RearEyeInnerColor,...
@@ -503,7 +581,7 @@ classdef DynamicSpring < handle
                 % ------------------------ Case Block
                 x = [0, r_eye_out, r_eye_out, 0] + 1.2*r_eye_out;
                 y = [-1.5*r_eye_in, -1.5*r_eye_in, 1.5*r_eye_in, 1.5*r_eye_in];
-                case_patch(2) = patch(obj.ax, 'XData', x, 'YData', y, ...
+                case_patch(2) = patch(tmp_ax, 'XData', x, 'YData', y, ...
                     'LineJoin', 'round', 'FaceColor', 'w', 'LineWidth', line_width, ...
                     'Tag', 'Case Block');
 
@@ -514,7 +592,7 @@ classdef DynamicSpring < handle
                 b = .3*a;
                 x = [-b*sin(t), 1.2*r_eye_out, 1.2*r_eye_out, 0] + 2*r_eye_out;
                 y = [a*cos(t), -a, a, a];
-                case_patch(3) = patch(obj.ax, 'XData', x, 'YData', y,...
+                case_patch(3) = patch(tmp_ax, 'XData', x, 'YData', y,...
                     'FaceColor', obj.plotting_options.RearClevisColor,...
                     'LineWidth', line_width, ...
                     'Tag', 'Case Mounting Clevis 1');
@@ -524,14 +602,14 @@ classdef DynamicSpring < handle
                 t_i = 2*r_eye_out/obj.pitch;
                 t_f = (x_end - 1.5*r_eye_out)/obj.pitch;
                 t = t_i:0.05:t_f;
-                spring_plt = plot(obj.ax, obj.pitch*t, -obj.radius*sin(t), ...
+                spring_plt = plot(tmp_ax, obj.pitch*t, -obj.radius*sin(t), ...
                     'LineWidth', line_width, 'Color', obj.plotting_options.SpringBodyColor, ...
                     'Tag', 'Spring');
-                obj.ax.Children = circshift(obj.ax.Children, -1);
+                tmp_ax.Children = circshift(tmp_ax.Children, -1);
 
 
                 % ------------------------ Case Mounting Joint 2
-                case_patch(4) = PlotAnnulusPatch(obj.ax, [x_end, 0], radius_eye_vec,...
+                case_patch(4) = PlotAnnulusPatch(tmp_ax, [x_end, 0], radius_eye_vec,...
                     'FaceColor', obj.plotting_options.FrontEyeOuterColor,...
                     'FaceAlpha', obj.plotting_options.FrontEyeOuterColorAlpha,...
                     'InnerCircleFaceColor', obj.plotting_options.FrontEyeInnerColor,...
@@ -546,7 +624,7 @@ classdef DynamicSpring < handle
                 b = .3*a;
                 x = -[-b*sin(t), 1.2*r_eye_out, 1.2*r_eye_out, 0] + x_end - 1.5*r_eye_out;
                 y = [a*cos(t), -a, a, a];
-                case_patch(5) = patch(obj.ax, 'XData', x, 'YData', y,...
+                case_patch(5) = patch(tmp_ax, 'XData', x, 'YData', y,...
                     'FaceColor', obj.plotting_options.FrontClevisColor,...
                     'LineWidth', line_width, ...
                     'Tag', 'Case Mounting Clevis 2');
@@ -556,18 +634,23 @@ classdef DynamicSpring < handle
                 x = [.5*(r_eye_in+r_eye_out), x_end-.5*(r_eye_in+r_eye_out), ...
                     x_end-.5*(r_eye_in+r_eye_out), .5*(r_eye_in+r_eye_out)];
                 y = [-r_eye_in, -r_eye_in, r_eye_in, r_eye_in];
-                case_patch(6) = patch(obj.ax, 'XData', x, 'YData', y, ...
+                case_patch(6) = patch(tmp_ax, 'XData', x, 'YData', y, ...
                     'FaceColor', [0.28,0.22,0.22], 'LineWidth', line_width, ...
                     'Tag', 'Shaft');
-                obj.ax.Children = circshift(obj.ax.Children, -1);
+                tmp_ax.Children = circshift(tmp_ax.Children, -1);
 
 
                 set([spring_plt, case_patch], 'Parent', springPlotGp);
-                obj.ax.Children(1).Children = circshift(obj.ax.Children(1).Children, -1);
-                obj.ax.Children(1).Children([6,7]) = obj.ax.Children(1).Children([7,6]);
-
+                tmp_ax.Children(1).Children = circshift(tmp_ax.Children(1).Children, -1);
+                if ~isempty(spring_plt)
+                    % Exchange the position of spring and shaft: Placing
+                    % shaft on top of the spring: 6=Spring, 7=Shaft
+                    tmp_ax.Children(1).Children([6,7]) = tmp_ax.Children(1).Children([7,6]);
+                end
             end
-
+            set(springPlotGp, 'Parent', obj.ax);
+            close(tmp_fig);
+            clear tmp_fig tmp_ax
         end
 
         % ------------------------------------------------------------------------------
@@ -615,8 +698,21 @@ classdef DynamicSpring < handle
                 t_i = 2*r_eye_out/obj.pitch;
                 t_f = (x_end - 1.5*r_eye_out)/obj.pitch;
                 t = t_i:0.05:t_f;
-                spring_plt.XData = obj.pitch*t;
-                spring_plt.YData = -obj.radius*sin(t);
+                if isempty(spring_plt)
+                    % if no spring is plotted, make an attempt to plot it
+                    spring_plt = plot(obj.ax, obj.pitch*t, -obj.radius*sin(t), ...
+                        'LineWidth', obj.plotting_options.LineWidth, ...
+                        'Color', obj.plotting_options.SpringBodyColor, ...
+                        'Tag', 'Spring');
+                    if ~isempty(spring_plt)
+                        % if plotting was successful
+                        spring_plt.Parent = springPlotGp;
+                        springPlotGp.Children = circshift(springPlotGp.Children, -1);
+                    end
+                else
+                    spring_plt.XData = obj.pitch*t;
+                    spring_plt.YData = -obj.radius*sin(t);
+                end
 
 
                 % ------------------------ Updating Case Mounting Joint 2
@@ -701,7 +797,7 @@ inner_circle = patch(ax, ...
     'Tag', [options.Tag, ' inner circle']);
 
 
-annulusPatch = hggroup('Tag', options.Tag);
+annulusPatch = hggroup(ax, 'Tag', options.Tag);
 set([outer_circle, inner_circle], 'Parent', annulusPatch);
 
 end

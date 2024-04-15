@@ -31,7 +31,7 @@ ball_tl = TracingLine('ball_tl', bufferSize, ...
     'xBufferInit', Qx(1)*ones(1,bufferSize), ...
     'yBufferInit', Qy(1)*ones(1,bufferSize), ...
     'axes', ax);
-ball_tl.PlotLine('Color', 'red', 'LineWidth', 1.5, 'HeadMarker', true);
+ball_tl.Plot();
 
 pause(1);
 
@@ -40,7 +40,7 @@ n = 1;
 tic;    %start time measuring
 while (n <= numel(time))
 
-    ball_tl.AddPoint(Qx(n), Qy(n), true);
+    ball_tl.AddPoint(Qx(n), Qy(n));
     drawnow;  %updates the display
     t = toc; %measuring current time
     n = round(t*freq)+1;

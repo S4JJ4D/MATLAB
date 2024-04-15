@@ -65,7 +65,7 @@ freq = 1/median(diff(time));
 
 
 for i=1:numTypes
-    springs(i).PlotSpring(vecnorm([Qx(n), Qy(n)]), 'Configuration', [0, -3*(i-1), atan2(Qy(n), Qx(n))]);
+    springs(i).Plot([0, -3*(i-1)], atan2(Qy(n), Qx(n)), vecnorm([Qx(n), Qy(n)]));  
 end
 
 pause(.5);
@@ -77,7 +77,7 @@ while (n <= numel(time))
 
     for i=1:numTypes
         set(boxes(i), 'XData', [0, 1.25, 1.25, 0] + Qx(n));
-        springs(i).PlotSpring(vecnorm([Qx(n), Qy(n)]), 'Configuration', [0, -3*(i-1), atan2(Qy(n), Qx(n))]);
+        springs(i).Plot([0, -3*(i-1)], atan2(Qy(n), Qx(n)), vecnorm([Qx(n), Qy(n)])); 
     end
 
     drawnow;

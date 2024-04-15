@@ -1,0 +1,14 @@
+1. Navigate to "C:\Program Files\MATLAB\R2022b\toolbox\",
+2. Pick a toolbox,
+3. Study built-in codes to learn.
+
+4.
+and use Ctrl+Shift+F to look for keywords such as "classdef" and etc.
+
+
+---------------------------------------------------------------------------
+
+> edit graph
+> edit signalMask
+> edit alphaShape
+> edit sdlsim
