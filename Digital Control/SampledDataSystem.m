@@ -1,4 +1,7 @@
-%% 
+%%
+% Useful Functions:
+% sldsim, imp2exp, lft, iconnect
+%%
 clear;
 close all;
 
@@ -59,7 +62,7 @@ Sys.OutputName = {'u';'y';'e'};
 ud = step(Sys(1), td');
 
 % search for the word 'resampling' in the following comments which
-% discuesses a way to retrieve sampled-time signals within the ltf control
+% discusses a way to retrieve sampled-time signals within the lft control
 % structure.
 
 
@@ -71,9 +74,9 @@ ud = step(Sys(1), td');
  % preceeded by a ZOH (D/A) and followed by A/D before contacting the
  % controller.
  %
- % In fact, 'lsim' is able to "simulate" the following sampled data (hybrid)
+ % In fact, 'sdlsim' is able to "simulate" the following sampled data (hybrid)
  % control system where <Ts> is the specified sample time for the digital
- % control system and <Tc> is chosen to be much smaller than <T> to emulate
+ % control system and <Tc> is chosen to be much smaller than <Ts> to emulate
  % the continuous-time nature of the plant and other analog components.
  %
  %
