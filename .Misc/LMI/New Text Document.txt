@@ -1,0 +1,29 @@
+There are some software packages (something like libraries and modules) as a high level programming interface using MATLAB as modeling language, to solve optimization problems. Some notable examples are:
+
+1. MATLAB native LMI Toolbox
+2. YALMIP
+3. CVX
+4 ...
+
+using these packages you can program/model/formulate your optimization problem. After that, These are high-level packages use "solvers" to solve that problem. Therefore, these packages rely on external solvers for the low-level numerical solution of optimization problem. Depending on the nature of the problem, different types of solvers should be used. refer to "https://yalmip.github.io/allsolvers/" for a list of solvers. Some of these solvers are free and some are commercial.
+
+install optimization package -----> install appropriate solvers
+
+• for example in cvx, solvers include: http://web.cvxr.com/cvx/doc/install.html#solvers-included-with-cvx
+• for example in yalmip, solvers include: https://yalmip.github.io/allsolvers/
+
+[SDPT3] is a fairly good (also free) solver for semidifinite programming. 
+
+YALMIP installation guide:
+1. follow the installation guide at https://yalmip.github.io/tutorial/installation/
+2. choose an appropriate solver at https://yalmip.github.io/allsolvers/
+3. to install sdpt3, follow the instructions at https://blog.nus.edu.sg/mattohkc/softwares/sdpt3/
+
+
+
+links:
+•	SDPT3 is currently used as one of the main computational engines (Solvers) in optimization modeling languages such as CVX and YALMIP.
+•	http://ask.cvxr.com/t/why-isnt-cvx-accepting-my-model-read-this-first/570
+•	http://cvxr.com/cvx/
+•	https://blog.nus.edu.sg/mattohkc/softwares/sdpt3/
+•	https://yalmip.github.io/allsolvers/

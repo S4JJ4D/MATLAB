@@ -5,6 +5,7 @@
 4.
 and use Ctrl+Shift+F to look for keywords such as "classdef" and etc.
 
+5. You should definitely check 'doclink.m'.
 
 ---------------------------------------------------------------------------
 

@@ -103,3 +103,63 @@ to the 'Color' property. For example:
 
 
 35. [C{:}] is a faster inlined version of cell2mat (Test it using the command "tic; cell2mat(C); toc; tic; [C{:}]; toc;")
+
+36. docroot/matlabroot are functions with path to the root of the documentation/matlab on the system drive. [matlabroot, '\toolbox\matlab\helptools'] contains some good undocumented functions
+
+37. see doclink (A function on the matlab file center) function to incorporate links into your function help section
+
+38.1 get the url to the currently open window in matlab help browser:
+	$ docPage = char(com.mathworks.mlservices.MLHelpServices.getCurrentLocation);
+     It is advised to then use 'docroot' through 'fullfile' utility to construct an ip-free path. docPage contains local ip address. For example: htmlFile = htmlFile = fullfile(docroot,'simulink','slref','inverted-pendulum-with-animation.html')
+or 
+htmlFile = fullfile(docroot,'reinforcement-learning', 'ug', 'train-agents-to-control-quanser-qube-pendulum.html')
+
+38.2 Once you have the link to particular help page in the help browser, you can open it programmatically using:
+	$ web(htmlFile);
+     Or alternatively:
+	$ web(['file:///',htmlFile])
+     web has an undocumented argument -helpbrowser:
+	$ web(htmlFile, '-helpbrowser');
+
+
+39. Show a particular section of help:
+method (I) use the previous method ---> open the section in the gui help browser ---> invoke docPage = ... to get its link ---> use web(...) to open it
+method (II) open page source from the context menu of the help browser page, search for "span id" within the html file, use helpview function: its first argument is the product name, i.g., 'simulink', 'matlab', ...
+
+limitation of 'helpview' function: the authors of toolboxes attach IDs only to certain subsections in the docs. As such, you cannot always get a link/ID to a subsection in doc page.
+	1. to find the first arguemnt for the 'helpview' function, you need to supply the name of a toolbox. you can find the name in
+		1.1 using 'toolboxdir' function. see its help
+		1.2 search through the file fullfile(prefdir, 'apps_toolset_apps.xml') for the names
+	2. to find the 2nd argument, right-click on the help page in help browser and select 'page source', search for "span id" within the opended html file, the corresponding value for each 'span id' can be used to refer to that particular subsection within the help page.
+examples:
+
+helpview('simulink','subsystem_defs')
+helpview('dsp','sample_rate_and_frame_rate_concepts')
+helpview('slcontrol','bql5xee-4')
+helpview('matlab','matlab_env_savepath')
+
+
+40. To see examples from above and also to create a hyperlink to a simulink block from a text annotation, to add/remove highlighting, see 'funnyblks.slx' model.
+
+
+
+Misc. Stuff
+---------------------------------------------------------
+MATLAB file exchange center: 
+getundoc - get undocumented object properties 
+---
+add 'doclink.m' to codes with good docs folder
+toolboxdir
+whatsnew
+winopen(prefdir)
+demo simulink % opens simulink examples in help browser
+---
+[matlabroot, '\toolbox\matlab\helptools'] contains some good functions
+---
+checkout the following packages from Yair M. Altman
+1. checkClass
+2. uiinspect
+---
+to be studied later: running matlab commands through url(!):
+http://127.0.0.1:31415/matlab/feval/rmiobjnavigate?arguments=[%22t01.slx%22,%22:1%22]
+

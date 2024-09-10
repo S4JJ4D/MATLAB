@@ -1,0 +1,5 @@
+1. Convex Optimization [Stephen Boyd, Lieven Vandenberghe]
+
+2. Linear Matrix Inequalities in System and Control Theory [Boyd]
+
+3. ETS Yalmip Slides: YALMIP: Optimization Made Easy! and Modeling Languages/Layers for Optimization in general Pierre Haessig
