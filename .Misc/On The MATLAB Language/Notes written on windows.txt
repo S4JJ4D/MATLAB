@@ -99,6 +99,9 @@ to the 'Color' property. For example:
 %     'XAxisLocation', 'origin', 'YAxisLocation', 'origin', ...
 %     'Box', 'on', ...
 %     'FontName', 'Source Code Pro');
+% set([ax.XAxis, ax.YAxis], 'Color', '#737373', 'TickLabelColor', 'k',...
+    'LineWidth',.8);
+% set([ax.XLabel, ax.YLabel], 'Color', 'k')
 --------------------------------------------------------
 
 
